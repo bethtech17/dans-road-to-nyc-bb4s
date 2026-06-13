@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Dan's Road to NYC · Marathon Trainer</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NYC 26.2">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#1e3a8a; --blue-light:#dbeafe;
+    --orange:#f97316; --orange-light:#ffedd5;
+    --green:#16a34a; --green-light:#dcfce7;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --bg:#f3f4f6; --card:#ffffff;
+    --base:#0ea5e9; --hill:#8b5cf6; --speed:#f97316; --marathon:#dc2626; --taper:#16a34a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); line-height:1.45;}
+  .wrap{max-width:980px; margin:0 auto; padding:16px 16px 80px;}
+
+  /* ---------- header ---------- */
+  header.hero{background:linear-gradient(135deg,var(--blue-dark),var(--blue)); color:#fff; border-radius:16px; padding:22px 24px; margin-bottom:16px; position:relative; overflow:hidden;}
+  header.hero::after{content:"🗽"; position:absolute; right:18px; top:50%; transform:translateY(-50%); font-size:64px; opacity:.12;}
+  header.hero h1{font-size:24px; font-weight:800; letter-spacing:-.02em; padding-right:104px;}
+  header.hero .sub{opacity:.85; font-size:14px; margin-top:2px; padding-right:104px;}
+  .hero-photos{position:absolute; top:16px; right:18px; display:flex; z-index:2; cursor:pointer;}
+  .hero-photos img{width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.9); box-shadow:0 2px 8px rgba(0,0,0,.35); transition:transform .2s;}
+  .hero-photos img+img{margin-left:-14px;}
+  .hero-photos:hover img{transform:scale(1.1);}
+  img.runpic{object-position:50% 12%;}
+  .hero-stats{display:flex; gap:18px; margin-top:14px; flex-wrap:wrap;}
+  .hero-stat{background:rgba(255,255,255,.12); border-radius:10px; padding:8px 14px;}
+  .hero-stat b{display:block; font-size:20px;}
+  .hero-stat span{font-size:11px; text-transform:uppercase; letter-spacing:.06em; opacity:.8;}
+
+  /* ---------- tabs ---------- */
+  nav.tabs{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
+  nav.tabs button{flex:1; min-width:120px; padding:10px 14px; border:1px solid var(--line); background:var(--card); border-radius:10px; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer;}
+  nav.tabs button.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+  nav.tabs button.print-btn{background:var(--orange); border-color:var(--orange); color:#fff; flex:0 0 auto;}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px;}
+  .card h2{font-size:16px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .sunday-banner{background:linear-gradient(135deg,#fff7ed,#ffedd5); border:1px solid #fdba74;}
+  .badge{display:inline-block; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px; text-transform:uppercase; letter-spacing:.04em;}
+  .badge.base{background:#e0f2fe; color:#0369a1;} .badge.hill{background:#ede9fe; color:#6d28d9;}
+  .badge.speed{background:#ffedd5; color:#c2410c;} .badge.marathon{background:#fee2e2; color:#b91c1c;}
+  .badge.taper{background:#dcfce7; color:#15803d;} .badge.race{background:#1e3a8a; color:#fff;}
+  .badge.cutback{background:#f1f5f9; color:#64748b;}
+  .badge.peak{background:#fef9c3; color:#a16207;}
+
+  /* ---------- week grid ---------- */
+  .day-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:10px;}
+  @media(max-width:720px){ .day-grid{grid-template-columns:repeat(2,1fr);} .day-cell.sun-cell{grid-column:span 2;} }
+  .day-cell{border:1px solid var(--line); border-radius:10px; padding:8px; min-height:104px; font-size:12px; position:relative; background:#fafafa; display:flex; flex-direction:column;}
+  .day-cell.today{outline:2px solid var(--orange); outline-offset:1px;}
+  .day-cell.run{background:var(--blue-light); border-color:#bfdbfe;}
+  .day-cell.workout{background:#ede9fe; border-color:#ddd6fe;}
+  .day-cell.long{background:var(--orange-light); border-color:#fed7aa;}
+  .day-cell.race{background:#1e3a8a; color:#fff; border-color:#1e3a8a;}
+  .day-cell.done{box-shadow:inset 0 0 0 2px var(--green);}
+  .day-cell .dname{font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); display:flex; justify-content:space-between;}
+  .day-cell.race .dname{color:#bfdbfe;}
+  .day-cell .dwhat{font-weight:700; margin-top:3px; font-size:12.5px;}
+  .day-cell .ddetail{color:var(--muted); font-size:11px; margin-top:2px; flex:1;}
+  .day-cell.race .ddetail{color:#dbeafe;}
+  .day-cell .logline{font-size:10.5px; color:var(--green); font-weight:600; margin-top:3px;}
+  .day-cell button.logbtn{margin-top:6px; padding:4px 8px; border-radius:7px; border:1px solid var(--blue); background:#fff; color:var(--blue); font-size:11px; font-weight:600; cursor:pointer;}
+  .day-cell button.logbtn.logged{border-color:var(--green); color:var(--green);}
+
+  /* ---------- pickers ---------- */
+  .picker-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; font-size:13px;}
+  .picker-row .plabel{font-weight:600; min-width:170px; font-size:12.5px;}
+  .chip{padding:5px 12px; border-radius:99px; border:1px solid var(--line); background:#fff; font-size:12px; font-weight:600; cursor:pointer; color:var(--muted);}
+  .chip.sel{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .chip.sel.orange{background:var(--orange); border-color:var(--orange);}
+  .chip:disabled{opacity:.35; cursor:not-allowed;}
+  .hint{font-size:11.5px; color:var(--muted); margin-top:6px;}
+  .warn{font-size:12px; color:#b45309; background:#fffbeb; border:1px solid #fde68a; padding:6px 10px; border-radius:8px; margin-top:8px;}
+
+  /* ---------- all weeks list ---------- */
+  .week-row{background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden;}
+  .week-row.current{border-color:var(--orange); box-shadow:0 0 0 1px var(--orange);}
+  .week-head{display:flex; align-items:center; gap:10px; padding:12px 16px; cursor:pointer; flex-wrap:wrap;}
+  .week-head:hover{background:#f9fafb;}
+  .week-head .wnum{font-weight:800; font-size:14px; min-width:64px;}
+  .week-head .wdates{color:var(--muted); font-size:12.5px; min-width:120px;}
+  .week-head .wsum{font-size:12.5px; color:var(--ink); flex:1;}
+  .week-head .wmiles{font-weight:700; font-size:13px; color:var(--blue); white-space:nowrap;}
+  .week-head .chev{color:var(--muted); font-size:12px;}
+  .week-body{padding:4px 16px 16px; border-top:1px dashed var(--line);}
+  .progress-pill{height:6px; border-radius:99px; background:var(--line); overflow:hidden; margin-top:4px;}
+  .progress-pill i{display:block; height:100%; background:var(--green);}
+
+  /* ---------- phase legend / stats ---------- */
+  .phase-bar{display:flex; border-radius:8px; overflow:hidden; height:26px; font-size:10px; color:#fff; font-weight:700; text-align:center; margin:8px 0 4px;}
+  .phase-bar div{display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px;}
+  .stat-box{border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#fafafa;}
+  .stat-box b{font-size:20px; display:block; color:var(--blue);}
+  .stat-box span{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em;}
+
+  /* ---------- modal ---------- */
+  .modal-bg{position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal-bg.open{display:flex;}
+  .modal{background:#fff; border-radius:16px; padding:22px; width:100%; max-width:440px; max-height:92vh; overflow:auto;}
+  .modal h3{font-size:17px; margin-bottom:2px;}
+  .modal .msub{color:var(--muted); font-size:12.5px; margin-bottom:14px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12px; font-weight:700; margin-bottom:4px; color:var(--ink);}
+  .field input[type=text],.field input[type=number],.field textarea{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:14px; font-family:inherit;}
+  .field textarea{resize:vertical; min-height:64px;}
+  .field .note{font-size:11px; color:var(--muted); margin-top:3px;}
+  .check-row{display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--green-light); border-radius:10px; margin-bottom:14px; cursor:pointer;}
+  .check-row input{width:18px; height:18px; accent-color:var(--green);}
+  .check-row span{font-weight:700; font-size:14px; color:#166534;}
+  .modal-actions{display:flex; gap:8px; margin-top:16px;}
+  .modal-actions button{flex:1; padding:11px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:1px solid var(--line); background:#fff;}
+  .modal-actions .save{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .modal-actions .danger{color:#b91c1c; border-color:#fecaca; flex:0 0 auto;}
+  .pace-display{background:var(--blue-light); border-radius:10px; padding:10px 12px; font-size:13px; margin-bottom:12px;}
+  .pace-display b{color:var(--blue-dark);}
+
+  /* ---------- Sam dedication ---------- */
+  .sam-pill{margin-top:12px; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.35); color:#fff; border-radius:99px; padding:5px 14px; font-size:12.5px; font-weight:600; cursor:pointer; position:relative; z-index:1;}
+  .sam-pill:hover{background:rgba(255,255,255,.28);}
+  .dedication{display:flex; gap:18px; align-items:center; background:linear-gradient(135deg,#f8fafc,#eef2f7); flex-wrap:wrap;}
+  .ded-photos{display:flex; gap:12px;}
+  .polaroid{width:104px; height:124px; object-fit:cover; background:#fff; border:5px solid #fff; border-bottom-width:18px; border-radius:3px; box-shadow:0 4px 10px rgba(0,0,0,.18); cursor:pointer; transition:transform .25s;}
+  .polaroid.tilt-l{transform:rotate(-3deg);} .polaroid.tilt-r{transform:rotate(2.5deg);}
+  .polaroid:hover{transform:rotate(0) scale(1.07);}
+  .ded-text{flex:1; min-width:220px; font-size:13px; color:var(--ink);}
+  .ded-text b{display:block; font-size:15px; margin-bottom:4px; color:var(--blue-dark);}
+  .sam-modal{max-width:560px; text-align:center;}
+  .sam-modal .ded-photos{justify-content:center; margin:14px 0;}
+  .sam-modal .polaroid{width:200px; height:240px;}
+  @media(max-width:560px){ .sam-modal .polaroid{width:128px; height:152px;} }
+
+  /* ---------- milestone celebration ---------- */
+  .celebrate{max-width:430px; text-align:center; position:relative; overflow:hidden;}
+  .celebrate .c-emoji{font-size:46px; margin-bottom:6px;}
+  .celebrate h3{font-size:20px; margin-bottom:8px; color:var(--blue-dark);}
+  .celebrate p{font-size:14px; color:var(--ink); margin-bottom:6px;}
+  .celebrate .c-tag{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-weight:700; margin-bottom:4px;}
+  .celebrate .go-btn{margin-top:14px; padding:11px 26px; border-radius:10px; border:none; background:var(--orange); color:#fff; font-size:15px; font-weight:800; cursor:pointer;}
+  .confetti-bit{position:absolute; top:-26px; font-size:16px; animation:cfall linear forwards; pointer-events:none;}
+  @keyframes cfall{ to{ transform:translateY(560px) rotate(420deg); opacity:.05; } }
+
+  details.keybox{margin-top:8px;}
+  details.keybox summary{cursor:pointer; font-weight:700; font-size:13px; color:var(--blue);}
+  details.keybox .kbody{font-size:12.5px; color:var(--ink); margin-top:8px;}
+  details.keybox .kbody p{margin-bottom:7px;}
+  .footer-note{text-align:center; color:var(--muted); font-size:11.5px; margin-top:22px;}
+
+  /* ---------- PRINT ---------- */
+  #printable{display:none;}
+  @media print{
+    @page{size:letter landscape; margin:9mm;}
+    body{background:#fff;}
+    .wrap, .modal-bg{display:none !important;}
+    #printable{display:block; font-size:9px;}
+    #printable h1{font-size:15px; margin-bottom:1px;}
+    #printable .psub{font-size:9px; color:#444; margin-bottom:6px;}
+    #printable table{width:100%; border-collapse:collapse; table-layout:fixed;}
+    #printable th,#printable td{border:1px solid #999; padding:2.5px 3.5px; vertical-align:top; word-wrap:break-word;}
+    #printable th{background:#fff; color:#000; font-size:8.5px; text-transform:uppercase; border:1px solid #000; border-bottom:2px solid #000;}
+    #printable td .pd-what{font-weight:700;}
+    #printable td .pd-note{color:#444; font-size:7.8px;}
+    #printable .pd-tag{display:inline-block; font-size:6.8px; font-weight:700; letter-spacing:.06em; border:1px solid #000; padding:0 3px; border-radius:2px; margin-bottom:1px;}
+    #printable .wklabel{font-weight:700; white-space:nowrap;}
+    #printable .phrow td{background:#e8e8e8; font-weight:700; font-size:8.5px; text-transform:uppercase; letter-spacing:.04em; padding:2px 4px;}
+    #printable .miles-cell{font-weight:700; text-align:center;}
+    #printable td.p-long{border:2px solid #000;}
+    #printable td.p-race{border:3px double #000; font-weight:700;}
+    #printable .pkey{margin-top:5px; font-size:8px; color:#333;}
+    #printable .race-banner{margin-top:4px; font-weight:800; font-size:10px;}
+    tr{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-photos" title="Be Brave 4 Sam 🩶 — tap to view" onclick="openSam()">
+      <img src="IMG_8712.JPG" alt="Dan and his sister Samantha">
+      <img src="dan.jpeg" class="runpic" alt="Dan at the 2022 NYC Marathon">
+    </div>
+    <h1>Dan's Road to the NYC Marathon</h1>
+    <div class="sub">TCS NYC Marathon · Sunday, November 1, 2026 · based on the Kopf Running Program #2</div>
+    <button class="sam-pill" onclick="openSam()">🩶 GRAY NATION ENDURANCE</button>
+    <div class="hero-stats" id="heroStats"></div>
+  </header>
+
+  <nav class="tabs">
+    <button id="tabWeek" class="active" onclick="setTab('week')">📅 This Week</button>
+    <button id="tabPlan" onclick="setTab('plan')">🗓️ Full Plan</button>
+    <button id="tabProgress" onclick="setTab('progress')">📈 Progress</button>
+    <button class="print-btn" onclick="exportPDF()">🖨️ Export PDF</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <div class="footer-note">
+    Training pattern &amp; phasing adapted from the 2026 Kopf Running NYC Marathon Program #2 (Coach Seth Kopf).<br>
+    Data is saved automatically in this browser. Export PDF anytime for a printable schedule.
+  </div>
+</div>
+
+<!-- log modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="mTitle">Log Run</h3>
+    <div class="msub" id="mSub"></div>
+    <label class="check-row"><input type="checkbox" id="mDone"><span>Completed ✓</span></label>
+    <div class="field">
+      <label>Run Time</label>
+      <input type="text" id="mTime" placeholder="e.g. 45:30 or 1:32:05" inputmode="numeric" oninput="updatePace()">
+      <div class="note">mm:ss or h:mm:ss</div>
+    </div>
+    <div class="field">
+      <label>Distance (miles)</label>
+      <input type="number" id="mDist" step="0.1" min="0" oninput="updatePace()">
+    </div>
+    <div class="pace-display" id="mPaceBox">Pace: <b id="mPaceAuto">—</b></div>
+    <div class="field">
+      <label>Pace (min/mile) — auto-calculated, edit to override</label>
+      <input type="text" id="mPace" placeholder="e.g. 9:45">
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="mNotes" placeholder="How did it feel? Weather, route, fueling…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="danger" onclick="clearLog()">Clear</button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="save" onclick="saveLog()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sam dedication lightbox -->
+<div class="modal-bg" id="samBg" onclick="if(event.target===this)closeSam()">
+  <div class="modal sam-modal">
+    <div class="ded-photos">
+      <img class="polaroid tilt-l" src="IMG_8712.JPG" alt="Dan and his sister Samantha">
+      <img class="polaroid tilt-r runpic" src="dan.jpeg" alt="Dan running the 2022 NYC Marathon">
+    </div>
+    <div class="modal-actions"><button class="save" onclick="closeSam()">Every mile for Sam 🤍</button></div>
+  </div>
+</div>
+
+<!-- milestone celebration -->
+<div class="modal-bg" id="celebrateBg" onclick="if(event.target===this)closeCelebrate()">
+  <div class="modal celebrate">
+    <div id="cConfetti"></div>
+    <div class="c-emoji" id="cEmoji">🎉</div>
+    <div class="c-tag" id="cTag"></div>
+    <h3 id="cTitle"></h3>
+    <p id="cMsg"></p>
+    <button class="go-btn" onclick="closeCelebrate()">Let's go! 🎉</button>
+  </div>
+</div>
+
+<!-- print-only schedule -->
+<div id="printable"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   PLAN DATA — adapted from Kopf Running 2026 NYC Program #2
+   Phases: Base wk1-4 · Hills wk5-8 · Speed wk9-12 · Marathon-Specific wk13-20
+   Pattern: 2 toggleable weekday runs (Mon–Thu) + Friday short run (WFH day)
+            + weekend long run (Sat/Sun toggle, other day rest or recovery)
+   ============================================================ */
+const RACE_DATE = new Date(2026,10,1);          // Sun Nov 1 2026
+const PLAN_START = new Date(2026,5,15);         // Mon Jun 15 2026
+const DAY_KEYS = ['mon','tue','wed','thu','fri','sat','sun'];
+const DAY_NAMES = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
+const DAY_SHORT = {mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
+
+const PHASES = {
+  base:{name:'Base Building', cls:'base', color:'var(--base)'},
+  hill:{name:'Hill Training', cls:'hill', color:'var(--hill)'},
+  speed:{name:'Speed Training', cls:'speed', color:'var(--speed)'},
+  marathon:{name:'Marathon Specific', cls:'marathon', color:'var(--marathon)'},
+  taper:{name:'Taper', cls:'taper', color:'var(--taper)'}
+};
+
+// runA = easy run · runB = quality run/workout · fri = WFH short run · long = weekend long run
+// time-based workouts carry estMiles (≈10 min/mi easy effort) used only for weekly totals (shown with ≈)
+const PLAN = [
+ {w:1, phase:'base', runA:null,
+   runB:{what:'Run 4 miles', detail:'Easy pace · warm up / cool down · strength after', miles:4},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 7 miles', detail:'Controlled, comfortable, conversational', miles:7},
+   note:'Training begins Wednesday, June 17! One weekday run this week (Wed or Thu), then your Friday run and first long run.'},
+ {w:2, phase:'base',
+   runA:{what:'Run 3 miles', detail:'Easy pace · strength after', miles:3},
+   runB:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 8 miles', detail:'Easy, conversational pace', miles:8}},
+ {w:3, phase:'base',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 9 miles', detail:'Easy, conversational pace', miles:9}},
+ {w:4, phase:'base', cutback:true,
+   runA:{what:'Run 3 miles', detail:'Easy pace · strength after', miles:3},
+   runB:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 7 miles', detail:'Easy, conversational pace', miles:7},
+   note:'Cutback week — lighter load lets your body absorb the training.'},
+ {w:5, phase:'hill',
+   runA:{what:'Run 3 miles', detail:'Easy pace · strength after', miles:3},
+   runB:{what:'Long Hill Workout · 60 min', detail:'Warm up · long sustained hill repeats · cool down', estMiles:6, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 9 miles', detail:'Easy pace — OR race a 5K/10K this weekend', miles:9}},
+ {w:6, phase:'hill',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Steep Hill Workout · 60 min', detail:'Warm up · short steep hill repeats, walk-back recovery · cool down', estMiles:6, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 10 miles', detail:'Easy, conversational pace', miles:10}},
+ {w:7, phase:'hill',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Long Hill Workout · 70 min', detail:'Warm up · long sustained hill repeats · cool down', estMiles:7, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 11 miles', detail:'Easy, conversational pace', miles:11}},
+ {w:8, phase:'hill', cutback:true,
+   runA:{what:'Run 3 miles', detail:'Easy pace · strength after', miles:3},
+   runB:{what:'Midweek Hill Workout · 55 min', detail:'Warm up · rolling-hill circuit · cool down', estMiles:5.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 10 miles', detail:'Easy, conversational pace', miles:10},
+   note:'Slightly lighter week before the speed phase begins.'},
+ {w:9, phase:'speed',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Fartlek Workout · 55 min', detail:'15–20 min easy, then alternate 10K/5K-effort surges with 45–90 s easy between · cool down', estMiles:5.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles (or rest day)', miles:3},
+   long:{what:'Long Run · 12 miles', detail:'Easy, conversational pace', miles:12}},
+ {w:10, phase:'speed',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Speed Workout · 45 min', detail:'Warm up · interval session at 5K–10K effort · cool down', estMiles:4.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles — feeling strong? Kopf alt: 50-min speed workout', miles:3},
+   long:{what:'Long Run · 13 miles', detail:'Easy pace — OR race a 5K/10K this weekend', miles:13}},
+ {w:11, phase:'speed',
+   runA:{what:'Run 5 miles', detail:'Easy pace · strength after', miles:5},
+   runB:{what:'Leg Speed Workout · 45 min', detail:'Warm up · short fast reps / strides for turnover · cool down', estMiles:4.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 30 min or 3 miles — feeling strong? Kopf alt: 50-min speed workout', miles:3},
+   long:{what:'Long Run · 14 miles', detail:'Easy, conversational pace', miles:14}},
+ {w:12, phase:'speed', cutback:true,
+   runA:{what:'Run 5 miles', detail:'Easy pace · strength after', miles:5},
+   runB:{what:'Speed Workout · 55 min', detail:'Warm up · interval session at 5K–10K effort · cool down', estMiles:5.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 10 miles', detail:'Easy, conversational pace', miles:10},
+   bonus:'Optional (Kopf): 4 mi easy + cross-train on a free weekday — skip if tired.',
+   note:'Cutback week before the marathon-specific block.'},
+ {w:13, phase:'marathon',
+   runA:{what:'Run 5 miles', detail:'Easy pace · strength after', miles:5},
+   runB:{what:'Yasso 800s · 75 min', detail:'Warm up · 800 m repeats (run your goal marathon time as min:sec per 800) w/ equal jog recovery · cool down', estMiles:7.5, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 17 miles', detail:'Easy, conversational pace', miles:17},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.'},
+ {w:14, phase:'marathon',
+   runA:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   runB:{what:'Tempo Run · 60 min', detail:'Warm up · sustained comfortably-hard middle (~half the run) · cool down', estMiles:6, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 15 miles · Fast Finish', detail:'Easy pace, finish last 2–3 miles at marathon effort', miles:15},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.'},
+ {w:15, phase:'marathon',
+   runA:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   runB:{what:'Run 11 miles · Goal Race Pace', detail:'Warm up · big chunk at goal marathon pace · cool down', miles:11, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 12 miles · Progression', detail:'Start easy, gradually speed up each third', miles:12},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.'},
+ {w:16, phase:'marathon',
+   runA:{what:'Run 4 miles', detail:'Easy pace · strength after', miles:4},
+   runB:{what:'Yasso 800s · 90 min', detail:'Warm up · 800 m repeats w/ equal jog recovery · cool down', estMiles:9, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 18 miles · Fast Finish', detail:'Easy pace, finish last 2–3 miles at marathon effort', miles:18},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.'},
+ {w:17, phase:'marathon', peak:true,
+   runA:{what:'Run 7 miles', detail:'Easy pace · strength after', miles:7},
+   runB:{what:'Run 14 miles · Goal Race Pace', detail:'Warm up · big chunk at goal marathon pace · cool down', miles:14, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 20 MILES 🏔️', detail:'Peak long run! Easy pace, practice race-day fueling & gear', miles:20},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.',
+   note:'PEAK WEEK — the 20-miler, 3 weeks before race day. After this, the taper begins!'},
+ {w:18, phase:'taper',
+   runA:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   runB:{what:'Tempo Run · 60 min', detail:'Warm up · sustained comfortably-hard middle · cool down', estMiles:6, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 15 miles · Fast Finish', detail:'Easy pace, finish last 2 miles at marathon effort', miles:15},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.',
+   note:'Taper begins — trust the training, resist adding extra miles.'},
+ {w:19, phase:'taper',
+   runA:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   runB:{what:'Tempo Run · 90 min', detail:'Warm up · long steady tempo at marathon effort · cool down', estMiles:9, workout:true},
+   fri:{what:'Easy Run', detail:'Lesser of 40 min or 4 miles (or rest day)', miles:4},
+   long:{what:'Long Run · 12 miles · Goal Race Pace', detail:'Portions at goal marathon pace — last big dress rehearsal', miles:12},
+   bonus:'Optional (Kopf): 3 mi easy + cross-train on a free weekday — skip if tired.'},
+ {w:20, phase:'taper', race:true,
+   runA:{what:'Run 6 miles', detail:'Easy pace · strength after', miles:6},
+   runB:{what:'Tempo Run · 40 min', detail:'Warm up · short tempo to stay sharp · cool down', estMiles:4, workout:true},
+   fri:{what:'Easy Shakeout', detail:'Lesser of 40 min or 4 miles — or full rest', miles:4},
+   long:{what:'🏁 RACE DAY · TCS NYC MARATHON', detail:'26.2 miles through the five boroughs — every one of them for Sam. 🩶 You\'ve got this, Dan!', miles:26.2},
+   note:'Race week! Saturday = full rest. Sleep, hydrate, carb-load. See you in Central Park! 🗽'}
+];
+
+/* ---------------- milestones ---------------- */
+const MILESTONES = [
+ {id:'first-run', emoji:'🏃', tag:'First run logged', title:"And… he's off!",
+  msg:'"That day, for no particular reason, I decided to go for a little run." — Forrest Gump. The road to Central Park starts right here.', test:s=>s.runs>=1},
+ {id:'first-long', emoji:'🗺️', tag:'First long run', title:'First long run ✓',
+  msg:'Fun fact: the marathon is 26.2 miles because the 1908 London Olympics stretched the course so it would finish in front of the royal family\'s viewing box. Feel free to blame the Royals at mile 25.', test:s=>s.longs>=1},
+ {id:'runs-10', emoji:'🏀', tag:'10 runs logged', title:'10 runs deep!',
+  msg:'Willis Reed limped out of the Garden tunnel on one good leg and won Game 7 in 1970. You\'ve got two good legs and officially zero excuses. Go New York, go New York, go!', test:s=>s.runs>=10},
+ {id:'miles-50', emoji:'🥅', tag:'50 total miles', title:'50 in 50(ish)!',
+  msg:'Mike Bossy scored 50 goals in 50 games in 1980–81 — still the only Islander ever to do it. 50 training miles means you\'re officially on a heater.', test:s=>s.miles>=50},
+ {id:'long-10', emoji:'🥊', tag:'Double-digit long run', title:'Double digits, baby!',
+  msg:'"Every champion was once a contender that refused to give up." — Rocky Balboa. First 10+ miler of the program is in the books.', test:s=>s.maxLong>=10},
+ {id:'miles-100', emoji:'💯', tag:'100 total miles', title:'THE 100-MILE CLUB',
+  msg:'100 miles is roughly 5,600 trips down the court at Madison Square Garden. Even the \'94 Knicks didn\'t play that much defense.', test:s=>s.miles>=100},
+ {id:'long-13', emoji:'📺', tag:'Half-marathon distance', title:'13.1+ in training!',
+  msg:'"Boy, that escalated quickly." — Ron Burgundy. You just ran an entire half marathon as a weekend training run. Stay classy, Dan.', test:s=>s.maxLong>=13.1},
+ {id:'weeks-10', emoji:'⛰️', tag:'Week 10 of 20', title:'Halfway there!',
+  msg:'Fun fact: at the halfway point of a 20-week plan, your heart is already pumping more blood per beat and your legs have grown millions of new mitochondria. Science says you\'re literally a machine now.', test:s=>s.weeksDone>=10},
+ {id:'long-15', emoji:'🇺🇸', tag:'15-mile long run', title:'GREAT MOMENTS…',
+  msg:'"…are born from great opportunity." — Herb Brooks, Miracle. 15 miles down. Do you believe in miracles? Your legs are starting to.', test:s=>s.maxLong>=15},
+ {id:'miles-200', emoji:'🏆', tag:'200 total miles', title:'200 MILES!',
+  msg:'The Islanders won 19 consecutive playoff series from 1980–84 — a record no team in any sport has ever touched. This training streak of yours is entering dynasty territory.', test:s=>s.miles>=200},
+ {id:'long-18', emoji:'🧱', tag:'18-mile long run', title:'You met The Wall',
+  msg:'Fun fact: your body stores about 2,000 calories of glycogen — roughly 18 miles\' worth. Past that it\'s all fueling and heart. You just trained both.', test:s=>s.maxLong>=18},
+ {id:'peak-20', emoji:'🩶', tag:'Peak 20-miler · 3 weeks out', title:'20 MILES. PEAK CONQUERED.',
+  msg:'The hardest run of the entire plan is DONE — it\'s all taper from here. Be Brave 4 Sam — she would be so, so proud of you. 🩶', test:s=>s.peakDone},
+ {id:'taper', emoji:'🛋️', tag:'Taper time', title:'Welcome to the taper',
+  msg:'Fun fact: a proper taper improves marathon performance by about 3%. Doing LESS is now literally the assignment — the first time load management has ever been good news for a New York sports fan.', test:s=>s.weeksDone>=17},
+ {id:'race', emoji:'🏅', tag:'26.2 · TCS NYC Marathon', title:'MARATHONER. AGAIN.',
+  msg:'26.2 miles through five boroughs — every single one for Sam and the National Brain Tumor Society. "If you can make it here, you\'ll make it anywhere." We could not be prouder of you, Dan. 💙🩶', test:s=>s.raceDone},
+];
+function milestoneStats(){
+  let runs=0, miles=0, longs=0, maxLong=0, weeksDone=0;
+  PLAN.forEach(p=>{
+    const st=ws(p.w);
+    Object.entries(st.logs).forEach(([slot,l])=>{
+      if(!l||!l.done) return;
+      runs++; const d=parseFloat(l.dist)||0; miles+=d;
+      if(slot==='long' && p.w!==20){ longs++; maxLong=Math.max(maxLong,d); }
+    });
+    if(weekDone(p.w)) weeksDone++;
+  });
+  const peakDone = !!(ws(17).logs.long && ws(17).logs.long.done);
+  const raceDone = !!(ws(20).logs.long && ws(20).logs.long.done);
+  return {runs,miles,longs,maxLong,weeksDone,peakDone,raceDone};
+}
+function checkMilestones(){
+  if(!state.seen) state.seen=[];
+  const s=milestoneStats();
+  for(const m of MILESTONES){
+    if(state.seen.includes(m.id)) continue;
+    if(m.test(s)){ state.seen.push(m.id); save(); showCelebration(m); return; }
+  }
+}
+function showCelebration(m){
+  document.getElementById('cEmoji').textContent = m.emoji;
+  document.getElementById('cTag').textContent = m.tag;
+  document.getElementById('cTitle').textContent = m.title;
+  document.getElementById('cMsg').textContent = m.msg;
+  const conf = document.getElementById('cConfetti');
+  const bits = ['🎉','🧡','💙','⭐','🏃','🗽','🩶'];
+  let h='';
+  for(let i=0;i<26;i++){
+    h+=`<span class="confetti-bit" style="left:${Math.round(Math.random()*96)}%;animation-duration:${(2.4+Math.random()*1.8).toFixed(2)}s;animation-delay:${(Math.random()*0.9).toFixed(2)}s">${bits[i%bits.length]}</span>`;
+  }
+  conf.innerHTML=h;
+  document.getElementById('celebrateBg').classList.add('open');
+}
+function closeCelebrate(){ document.getElementById('celebrateBg').classList.remove('open'); document.getElementById('cConfetti').innerHTML=''; }
+function openSam(){ document.getElementById('samBg').classList.add('open'); }
+function closeSam(){ document.getElementById('samBg').classList.remove('open'); }
+
+/* ---------------- state ---------------- */
+const LS_KEY = 'dan-nyc-marathon-2026';
+let state = loadState();
+let activeTab = 'week';
+let expandedWeeks = new Set();
+let modalCtx = null;
+
+function defaultWeekState(w){
+  const s = {dayA:'mon', dayB:'wed', longDay:'sat', offWeekend:'rest', logs:{}};
+  if(w===1){ s.dayA=null; s.dayB='wed'; }
+  if(w>=12){ s.dayB='thu'; }          // Kopf places the quality session Thu in weeks 12-20
+  if(w===20){ s.longDay='sun'; s.offWeekend='rest'; } // race day is fixed: Sun Nov 1
+  return s;
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.weeks) return s; }
+  }catch(e){}
+  const s = {weeks:{}};
+  PLAN.forEach(p=>{ s.weeks[p.w] = defaultWeekState(p.w); });
+  return s;
+}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function ws(w){ if(!state.weeks[w]) state.weeks[w]=defaultWeekState(w); return state.weeks[w]; }
+
+/* ---------------- date helpers ---------------- */
+function weekStartDate(w){ const d=new Date(PLAN_START); d.setDate(d.getDate()+(w-1)*7); return d; }
+function dateFor(w, dayKey){ const d=weekStartDate(w); d.setDate(d.getDate()+DAY_KEYS.indexOf(dayKey)); return d; }
+function fmtDate(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function fmtRange(w){ const a=weekStartDate(w), b=new Date(a); b.setDate(b.getDate()+6); return fmtDate(a)+' – '+fmtDate(b); }
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function today(){ return new Date(); }
+function currentWeekNum(){
+  const t = today(); t.setHours(0,0,0,0);
+  if(t < PLAN_START) return 1;
+  const diff = Math.floor((t - PLAN_START)/(864e5));
+  return Math.min(20, Math.floor(diff/7)+1);
+}
+function daysToRace(){ const t=today(); t.setHours(0,0,0,0); return Math.max(0, Math.round((RACE_DATE - t)/864e5)); }
+function isSunday(){ return today().getDay()===0; }
+
+/* ---------------- schedule assembly ---------------- */
+// returns {mon:{slot,info}, ...} for a week using chosen days
+function weekSchedule(w){
+  const p = PLAN[w-1], st = ws(w);
+  const sched = {};
+  DAY_KEYS.forEach(k=> sched[k]={slot:null, info:null});
+  if(p.runA && st.dayA) sched[st.dayA] = {slot:'runA', info:p.runA};
+  if(p.runB && st.dayB) sched[st.dayB] = {slot:'runB', info:p.runB};
+  sched.fri = {slot:'fri', info:p.fri};
+  sched[st.longDay] = {slot:'long', info:p.long};
+  const offDay = st.longDay==='sat' ? 'sun' : 'sat';
+  if(w!==20 && st.offWeekend==='recovery'){
+    sched[offDay] = {slot:'recovery', info:{what:'Recovery Run · 2–3 miles', detail:'Very easy shake-out — slower than easy pace', estMiles:3}};
+  }
+  if(w===20){ sched.sat = {slot:null, info:{what:'REST', detail:'Mandatory pre-race rest — stay off your feet', rest:true}}; }
+  return sched;
+}
+function plannedMiles(w){
+  const p=PLAN[w-1], st=ws(w);
+  let m=0, approx=false;
+  [p.runA,p.runB,p.fri,p.long].forEach(r=>{ if(!r)return; if(r.miles!=null)m+=r.miles; else if(r.estMiles){m+=r.estMiles; approx=true;} });
+  if(w!==20 && st.offWeekend==='recovery'){ m+=3; approx=true; }
+  return {miles:m, approx};
+}
+function loggedMiles(w){
+  const st=ws(w); let m=0;
+  Object.values(st.logs).forEach(l=>{ if(l.done && l.dist) m+=parseFloat(l.dist)||0; });
+  return m;
+}
+function slotsForWeek(w){
+  const p=PLAN[w-1], st=ws(w), out=[];
+  if(p.runA) out.push('runA');
+  if(p.runB) out.push('runB');
+  out.push('fri','long');
+  if(w!==20 && st.offWeekend==='recovery') out.push('recovery');
+  return out;
+}
+function weekDone(w){
+  const st=ws(w);
+  const req = slotsForWeek(w).filter(s=>s!=='recovery');
+  return req.every(s=> st.logs[s] && st.logs[s].done);
+}
+function slotInfo(w, slot){
+  const p=PLAN[w-1];
+  if(slot==='runA') return p.runA; if(slot==='runB') return p.runB;
+  if(slot==='fri') return p.fri; if(slot==='long') return p.long;
+  if(slot==='recovery') return {what:'Recovery Run · 2–3 miles', detail:'Very easy shake-out', estMiles:3};
+  return null;
+}
+function slotDay(w, slot){
+  const st=ws(w);
+  if(slot==='runA') return st.dayA; if(slot==='runB') return st.dayB;
+  if(slot==='fri') return 'fri'; if(slot==='long') return st.longDay;
+  if(slot==='recovery') return st.longDay==='sat'?'sun':'sat';
+  return null;
+}
+
+/* ---------------- pace helpers ---------------- */
+function parseTime(str){
+  if(!str) return null;
+  const parts = str.trim().split(':').map(s=>parseInt(s,10));
+  if(parts.some(isNaN)) return null;
+  if(parts.length===3) return parts[0]*3600+parts[1]*60+parts[2];
+  if(parts.length===2) return parts[0]*60+parts[1];
+  if(parts.length===1) return parts[0]*60;
+  return null;
+}
+function fmtPace(secPerMile){
+  if(!isFinite(secPerMile)||secPerMile<=0) return null;
+  const m=Math.floor(secPerMile/60), s=Math.round(secPerMile%60);
+  return m+':'+String(s).padStart(2,'0');
+}
+function calcPace(timeStr, dist){
+  const sec=parseTime(timeStr), d=parseFloat(dist);
+  if(!sec||!d||d<=0) return null;
+  return fmtPace(sec/d);
+}
+
+/* ---------------- rendering ---------------- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderHero(){
+  const cw = currentWeekNum();
+  const totalDone = PLAN.filter(p=>weekDone(p.w)).length;
+  let miles=0; PLAN.forEach(p=>{ miles+=loggedMiles(p.w); });
+  document.getElementById('heroStats').innerHTML = `
+    <div class="hero-stat"><b>${daysToRace()}</b><span>days to race</span></div>
+    <div class="hero-stat"><b>Week ${cw}/20</b><span>${esc(PHASES[PLAN[cw-1].phase].name)}</span></div>
+    <div class="hero-stat"><b>${miles.toFixed(1)} mi</b><span>logged so far</span></div>
+    <div class="hero-stat"><b>${totalDone}/20</b><span>weeks completed</span></div>`;
+}
+
+function setTab(t){
+  activeTab=t;
+  ['week','plan','progress'].forEach(x=>{
+    document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active', x===t);
+  });
+  render();
+}
+
+function dayPickersHTML(w){
+  const p=PLAN[w-1], st=ws(w);
+  if(w===20){
+    return `<div class="picker-row"><span class="plabel">🏁 Race day</span><span style="font-weight:700;color:var(--blue-dark)">Sunday, Nov 1 — fixed (Saturday = rest)</span></div>
+      ${pickRow(w,'dayA','🏃 Easy run day', p.runA)}
+      ${pickRow(w,'dayB','⚡ Workout day', p.runB)}`;
+  }
+  let html='';
+  if(p.runA) html+=pickRow(w,'dayA','🏃 Easy run day', p.runA);
+  if(p.runB) html+=pickRow(w,'dayB', p.runB.workout?'⚡ Workout day':'🏃 Run #2 day', p.runB);
+  // long run picker
+  html+=`<div class="picker-row"><span class="plabel">🔥 Long run day</span>`;
+  ['sat','sun'].forEach(d=>{
+    html+=`<button class="chip ${st.longDay===d?'sel orange':''}" onclick="setLongDay(${w},'${d}')">${DAY_SHORT[d]} ${fmtDate(dateFor(w,d))}</button>`;
+  });
+  html+=`</div>`;
+  // off-weekend day
+  const offDay = st.longDay==='sat'?'sun':'sat';
+  html+=`<div class="picker-row"><span class="plabel">😌 ${DAY_NAMES[offDay]} (other weekend day)</span>
+    <button class="chip ${st.offWeekend==='rest'?'sel':''}" onclick="setOffWeekend(${w},'rest')">Rest</button>
+    <button class="chip ${st.offWeekend==='recovery'?'sel':''}" onclick="setOffWeekend(${w},'recovery')">Recovery run (2–3 mi)</button>
+  </div>`;
+  if(p.runB && p.runB.workout && st.dayB==='thu' && st.longDay==='sat' && (p.long.miles||0)>=12){
+    html+=`<div class="warn">⚠️ Heads up: workout Thu + run Fri + long run Sat is 3 hard-ish days in a row. Consider the workout earlier in the week or the long run on Sunday.</div>`;
+  }
+  return html;
+}
+function pickRow(w, key, label, info){
+  const st=ws(w);
+  const allowed = (w===1) ? ['wed','thu'] : ['mon','tue','wed','thu'];
+  let html=`<div class="picker-row"><span class="plabel">${label}<br><small style="font-weight:400;color:var(--muted)">${esc(info.what)}</small></span>`;
+  allowed.forEach(d=>{
+    const other = key==='dayA' ? st.dayB : st.dayA;
+    const dis = d===other;
+    html+=`<button class="chip ${st[key]===d?'sel':''}" ${dis?'disabled':''} onclick="setRunDay(${w},'${key}','${d}')">${DAY_SHORT[d]} ${fmtDate(dateFor(w,d))}</button>`;
+  });
+  return html+`</div>`;
+}
+
+function setRunDay(w,key,d){ const st=ws(w); const other = key==='dayA'?st.dayB:st.dayA; if(d===other) return; st[key]=d; save(); render(); }
+function setLongDay(w,d){ const st=ws(w); if(w===20) return; st.longDay=d; save(); render(); }
+function setOffWeekend(w,v){ const st=ws(w); st.offWeekend=v; save(); render(); }
+
+function dayGridHTML(w){
+  const sched = weekSchedule(w), st = ws(w), tdy = today();
+  let html='<div class="day-grid">';
+  DAY_KEYS.forEach(k=>{
+    const d = dateFor(w,k);
+    const cell = sched[k];
+    const isToday = sameDay(d,tdy);
+    let cls='day-cell', body='';
+    if(k==='sun') cls+=' sun-cell';
+    if(isToday) cls+=' today';
+    if(cell.info && !cell.info.rest){
+      const slot = cell.slot;
+      const log = slot ? st.logs[slot] : null;
+      const isRace = (w===20 && slot==='long');
+      if(isRace) cls+=' race';
+      else if(slot==='long') cls+=' long';
+      else if(cell.info.workout) cls+=' workout';
+      else cls+=' run';
+      if(log && log.done) cls+=' done';
+      body=`<div class="dwhat">${esc(cell.info.what)}</div><div class="ddetail">${esc(cell.info.detail||'')}</div>`;
+      if(log && log.done){
+        const bits=[];
+        if(log.time) bits.push(log.time);
+        if(log.pace) bits.push(log.pace+'/mi');
+        if(log.dist) bits.push(log.dist+' mi');
+        body+=`<div class="logline">✓ ${esc(bits.join(' · '))||'Done'}</div>`;
+      }
+      if(slot) body+=`<button class="logbtn ${log&&log.done?'logged':''}" onclick="openModal(${w},'${slot}')">${log&&log.done?'✓ Edit log':'Log run'}</button>`;
+    } else if(cell.info && cell.info.rest){
+      body=`<div class="dwhat">🛌 ${esc(cell.info.what)}</div><div class="ddetail">${esc(cell.info.detail||'')}</div>`;
+    } else {
+      body=`<div class="dwhat" style="color:var(--muted);font-weight:600">Rest</div><div class="ddetail">Recovery is training too</div>`;
+    }
+    html+=`<div class="${cls}"><div class="dname"><span>${DAY_SHORT[k]}</span><span>${fmtDate(d)}</span></div>${body}</div>`;
+  });
+  return html+'</div>';
+}
+
+function weekCardInner(w, withPickers){
+  const p=PLAN[w-1];
+  const pm=plannedMiles(w), lm=loggedMiles(w);
+  let html='';
+  if(p.note) html+=`<div class="hint" style="background:#f8fafc;border:1px solid var(--line);padding:8px 10px;border-radius:8px;margin-top:8px">📌 ${esc(p.note)}</div>`;
+  if(withPickers) html+=dayPickersHTML(w);
+  html+=dayGridHTML(w);
+  let milesLine = `Planned: <b>${pm.approx?'≈':''}${pm.miles.toFixed(1).replace(/\.0$/,'')} mi</b>`;
+  if(lm>0) milesLine += ` · Logged: <b style="color:var(--green)">${lm.toFixed(1).replace(/\.0$/,'')} mi</b>`;
+  html+=`<div class="hint" style="margin-top:10px">${milesLine}${pm.approx?' <span style="opacity:.7">(≈ includes time-based workouts estimated at easy effort)</span>':''}</div>`;
+  if(p.bonus) html+=`<div class="hint">➕ ${esc(p.bonus)}</div>`;
+  return html;
+}
+
+function phaseBadges(p){
+  let b=`<span class="badge ${PHASES[p.phase].cls}">${esc(PHASES[p.phase].name)}</span>`;
+  if(p.cutback) b+=` <span class="badge cutback">Cutback</span>`;
+  if(p.peak) b+=` <span class="badge peak">Peak · 20 mi</span>`;
+  if(p.race) b+=` <span class="badge race">Race Week</span>`;
+  return b;
+}
+
+/* ----- This Week view ----- */
+function renderWeekView(){
+  const cw = currentWeekNum();
+  const p = PLAN[cw-1];
+  const beforeStart = today() < PLAN_START;
+  let html='';
+  if(beforeStart){
+    const d = Math.round((PLAN_START - today())/864e5);
+    html+=`<div class="card sunday-banner"><h2>🚀 Training starts ${d<=1?'tomorrow':'in '+d+' days'} — Monday, June 15</h2>
+      <div class="hint">First run: <b>Wednesday, June 17</b>. Set up week 1 below, and check out the full 20-week plan in the Full Plan tab.</div></div>`;
+  }
+  if(isSunday() && cw<20 && !beforeStart){
+    const nw = cw+1;
+    html+=`<div class="card sunday-banner"><h2>🗓️ It's Sunday — plan next week! <span class="badge speed">Week ${nw}</span></h2>
+      <div class="hint" style="margin-bottom:4px">Pick which days work for Dan's schedule next week (${fmtRange(nw)}):</div>
+      ${dayPickersHTML(nw)}${dayGridHTML(nw)}</div>`;
+  }
+  html+=`<div class="card"><h2>Week ${cw} <span class="hint" style="margin:0">· ${fmtRange(cw)} ·</span> ${phaseBadges(p)}</h2>
+    ${weekCardInner(cw,true)}</div>`;
+  // coach's notes
+  html+=`<div class="card"><details class="keybox"><summary>📖 Coach's Key — warm-ups, pacing &amp; the 3 C's</summary><div class="kbody">
+    <p><b>Warm up (non-negotiable):</b> dynamic moves before every run — leg swings, lunges, arm circles, hip rolls. If pressed for time, cut the run short, not the warm-up.</p>
+    <p><b>Cool down:</b> ~10-minute walk after each run to jump-start recovery.</p>
+    <p><b>Strength (after runs):</b> 1–2 short routines targeting hips/glutes, core, ITB or lower legs — insurance against injury.</p>
+    <p><b>Pacing — the 3 C's:</b> most runs should feel <b>Controlled, Comfortable &amp; Conversational</b>. If you can't chat, slow down. Speed comes from endurance.</p>
+    <p><b>Fartleks:</b> after 15–20 min easy, alternate surges at 10K/5K effort with 45–90 s easy between. Engaging, not exhausting.</p>
+    <p><b>Yasso 800s:</b> 800 m repeats — run each in your goal marathon time converted to minutes:seconds (4:00 marathon → 4:00 per 800), equal jog recovery.</p>
+    <p><b>Tempo:</b> comfortably hard — about the effort you could hold for an hour in a race.</p>
+    <p><b>Rest days:</b> the most important day in training. Do not skip them. Sleep 7+ hours.</p>
+  </div></details></div>`;
+  // dedication
+  html+=`<div class="card dedication">
+    <div class="ded-photos">
+      <img class="polaroid tilt-l" src="IMG_8712.JPG" alt="Dan and Samantha" onclick="openSam()">
+      <img class="polaroid tilt-r runpic" src="dan.jpeg" alt="Dan at the 2022 NYC Marathon" onclick="openSam()">
+    </div>
+    <div class="ded-text"><b>Be Brave 4 Sam 🩶</b>
+    That 2022 finish-line smile says it all — see you out there again, Dan. 💙</div>
+  </div>`;
+  document.getElementById('view').innerHTML = html;
+}
+
+/* ----- Full Plan view ----- */
+function renderPlanView(){
+  const cw = currentWeekNum();
+  let html=`<div class="card"><h2>20-Week Overview</h2><div class="phase-bar">
+    <div style="flex:4;background:var(--base)">Base 1–4</div>
+    <div style="flex:4;background:var(--hill)">Hills 5–8</div>
+    <div style="flex:4;background:var(--speed)">Speed 9–12</div>
+    <div style="flex:5;background:var(--marathon)">Marathon 13–17</div>
+    <div style="flex:3;background:var(--taper)">Taper 18–20</div>
+  </div><div class="hint">Long runs build 7 → 20 miles with cutback weeks to absorb training. Peak 20-miler lands Oct 17/18 — exactly 3 weeks before race day. Tap any week to choose days &amp; log runs.</div></div>`;
+  PLAN.forEach(p=>{
+    const w=p.w, st=ws(w), pm=plannedMiles(w);
+    const open = expandedWeeks.has(w);
+    const done = weekDone(w);
+    const sched=[];
+    if(p.runA&&st.dayA) sched.push(DAY_SHORT[st.dayA]+' '+(p.runA.miles||'')+(p.runA.miles?'mi':''));
+    if(p.runB&&st.dayB) sched.push(DAY_SHORT[st.dayB]+' '+(p.runB.workout?'⚡':'')+(p.runB.miles?p.runB.miles+'mi':'wkout'));
+    sched.push('Fri '+(p.fri.miles||'')+'mi');
+    sched.push(DAY_SHORT[st.longDay]+' '+(w===20?'RACE 26.2':p.long.miles+'mi'));
+    const logCount = slotsForWeek(w).filter(s=> st.logs[s] && st.logs[s].done).length;
+    const totSlots = slotsForWeek(w).length;
+    html+=`<div class="week-row ${w===cw?'current':''}">
+      <div class="week-head" onclick="toggleWeek(${w})">
+        <span class="wnum">${done?'✅':''} Wk ${w}</span>
+        <span class="wdates">${fmtRange(w)}</span>
+        ${phaseBadges(p)}
+        <span class="wsum">${esc(sched.join(' · '))}</span>
+        <span class="wmiles">${pm.approx?'≈':''}${pm.miles.toFixed(1).replace(/\.0$/,'')} mi</span>
+        <span class="chev">${open?'▲':'▼'}</span>
+      </div>
+      ${open?`<div class="week-body">${weekCardInner(w,true)}
+        <div class="hint" style="margin-top:6px">Runs logged: ${logCount}/${totSlots}</div>
+        <div class="progress-pill"><i style="width:${totSlots?Math.round(logCount/totSlots*100):0}%"></i></div>
+      </div>`:''}
+    </div>`;
+  });
+  document.getElementById('view').innerHTML = html;
+}
+function toggleWeek(w){ expandedWeeks.has(w)?expandedWeeks.delete(w):expandedWeeks.add(w); render(); }
+
+/* ----- Progress view ----- */
+function renderProgressView(){
+  let runsDone=0, totalRuns=0, miles=0, longCount=0;
+  const rows=[];
+  PLAN.forEach(p=>{
+    const w=p.w, st=ws(w);
+    const slots = slotsForWeek(w);
+    totalRuns += slots.filter(s=>s!=='recovery').length;
+    slots.forEach(s=>{
+      const l=st.logs[s];
+      if(l&&l.done){ runsDone++; miles+= parseFloat(l.dist)||0; if(s==='long')longCount++;
+        rows.push({w, slot:s, day:slotDay(w,s), log:l, info:slotInfo(w,s)});
+      }
+    });
+  });
+  let html=`<div class="card"><h2>📈 Training Progress</h2><div class="stat-grid">
+    <div class="stat-box"><b>${runsDone}</b><span>runs completed</span></div>
+    <div class="stat-box"><b>${miles.toFixed(1)}</b><span>miles logged</span></div>
+    <div class="stat-box"><b>${totalRuns?Math.round(runsDone/totalRuns*100):0}%</b><span>of plan done</span></div>
+    <div class="stat-box"><b>${longCount}</b><span>long runs done</span></div>
+  </div></div>`;
+  html+=`<div class="card"><h2>🏃 Run Log</h2>`;
+  if(rows.length===0){
+    html+=`<div class="hint">No runs logged yet. Log your first run from the This Week tab — first run is Wednesday, June 17!</div>`;
+  } else {
+    rows.sort((a,b)=> (a.w-b.w) || DAY_KEYS.indexOf(a.day)-DAY_KEYS.indexOf(b.day));
+    html+=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+      <tr style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase">
+      <th style="padding:6px">Date</th><th>Run</th><th>Time</th><th>Dist</th><th>Pace</th><th>Notes</th><th></th></tr>`;
+    rows.forEach(r=>{
+      const d = r.day ? fmtDate(dateFor(r.w, r.day)) : 'Wk '+r.w;
+      html+=`<tr style="border-top:1px solid var(--line)">
+        <td style="padding:7px 6px;white-space:nowrap">${esc(d)} <span style="color:var(--muted)">w${r.w}</span></td>
+        <td>${esc(r.info?r.info.what:'Run')}</td>
+        <td>${esc(r.log.time||'—')}</td>
+        <td>${r.log.dist?esc(r.log.dist)+' mi':'—'}</td>
+        <td>${esc(r.log.pace||'—')}</td>
+        <td style="max-width:220px;color:var(--muted)">${esc(r.log.notes||'')}</td>
+        <td><button class="logbtn" style="padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:11px" onclick="openModal(${r.w},'${r.slot}')">Edit</button></td></tr>`;
+    });
+    html+=`</table></div>`;
+  }
+  html+=`</div>`;
+  document.getElementById('view').innerHTML = html;
+}
+
+/* ---------------- modal ---------------- */
+function openModal(w, slot){
+  modalCtx = {w, slot};
+  const info = slotInfo(w,slot), st=ws(w), log = st.logs[slot]||{};
+  const day = slotDay(w,slot);
+  document.getElementById('mTitle').textContent = (w===20&&slot==='long') ? '🏁 Log the Marathon!' : 'Log: '+(info?info.what:'Run');
+  document.getElementById('mSub').textContent = `Week ${w} · ${day?DAY_NAMES[day]+', '+fmtDate(dateFor(w,day)):''}`;
+  document.getElementById('mDone').checked = !!log.done;
+  document.getElementById('mTime').value = log.time||'';
+  document.getElementById('mDist').value = log.dist!=null?log.dist:(info&&info.miles!=null?info.miles:(info&&info.estMiles?info.estMiles:''));
+  document.getElementById('mPace').value = log.pace||'';
+  document.getElementById('mNotes').value = log.notes||'';
+  updatePace();
+  document.getElementById('modalBg').classList.add('open');
+}
+function updatePace(){
+  const p = calcPace(document.getElementById('mTime').value, document.getElementById('mDist').value);
+  document.getElementById('mPaceAuto').textContent = p ? p+' /mi' : '—';
+  if(p) document.getElementById('mPace').value = p;
+}
+function saveLog(){
+  if(!modalCtx) return;
+  const {w,slot}=modalCtx, st=ws(w);
+  st.logs[slot] = {
+    done: document.getElementById('mDone').checked,
+    time: document.getElementById('mTime').value.trim(),
+    dist: document.getElementById('mDist').value,
+    pace: document.getElementById('mPace').value.trim(),
+    notes: document.getElementById('mNotes').value.trim()
+  };
+  save(); closeModal(); render();
+  if(st.logs[slot].done) checkMilestones();
+}
+function clearLog(){
+  if(!modalCtx) return;
+  const {w,slot}=modalCtx;
+  delete ws(w).logs[slot];
+  save(); closeModal(); render();
+}
+function closeModal(){ modalCtx=null; document.getElementById('modalBg').classList.remove('open'); }
+
+/* ---------------- print / PDF ---------------- */
+function buildPrintable(){
+  const quote = PRINT_QUOTES[(state.printCount||0) % PRINT_QUOTES.length];
+  let html=`<h1>Dan's NYC Marathon Training Plan — Race Day: Sunday, Nov 1, 2026</h1>
+  <div class="psub">20 weeks · June 15 – Nov 1, 2026 · Phases: Base (wk 1–4) → Hills (wk 5–8) → Speed (wk 9–12) → Marathon-Specific (wk 13–17) → Taper (wk 18–20) · Adapted from Kopf Running Program #2</div>
+  <div class="psub" style="font-style:italic">${quote}</div>
+  <table><colgroup><col style="width:7%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:12.5%"><col style="width:5.5%"></colgroup>
+  <tr><th>Week</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th><th>Miles</th></tr>`;
+  let lastPhase='';
+  PLAN.forEach(p=>{
+    const w=p.w;
+    const phaseLabel = PHASES[p.phase].name + (p.phase==='taper'?' (part of Kopf Marathon-Specific block)':'');
+    if(p.phase!==lastPhase){
+      html+=`<tr class="phrow"><td colspan="9">${esc(phaseLabel)}</td></tr>`;
+      lastPhase=p.phase;
+    }
+    const sched=weekSchedule(w), pm=plannedMiles(w), st=ws(w);
+    html+=`<tr><td class="wklabel">Wk ${w}<br>${fmtDate(weekStartDate(w))}${p.peak?'<br>★PEAK':''}</td>`;
+    DAY_KEYS.forEach(k=>{
+      const c=sched[k];
+      if(c.info && !c.info.rest){
+        const isRace=(w===20&&c.slot==='long');
+        const cls = isRace?'p-race': c.slot==='long'?'p-long': (c.info.workout?'p-workout':'p-run');
+        const tag = isRace?'RACE DAY': c.slot==='long'?'LONG RUN': (c.info.workout?'WORKOUT':'');
+        const log = c.slot? st.logs[c.slot]:null;
+        html+=`<td class="${cls}">${tag?`<div class="pd-tag">${tag}</div>`:''}<div class="pd-what">${esc(c.info.what)}</div><div class="pd-note">${esc(c.info.detail||'')}</div>${log&&log.done?`<div class="pd-note">✓ ${esc(log.time||'')} ${esc(log.pace?log.pace+'/mi':'')}</div>`:''}</td>`;
+      } else if(c.info && c.info.rest){
+        html+=`<td><div class="pd-what">REST</div><div class="pd-note">pre-race rest</div></td>`;
+      } else {
+        html+=`<td><div class="pd-note">Rest</div></td>`;
+      }
+    });
+    html+=`<td class="miles-cell">${pm.approx?'≈':''}${pm.miles.toFixed(1).replace(/\.0$/,'')}</td></tr>`;
+  });
+  html+=`</table>
+  <div class="pkey"><b>Key:</b> WORKOUT = hills/speed/tempo session · LONG RUN cells have a heavy outline · RACE DAY has a double outline · ≈ = includes time-based workout estimated at easy effort.
+  Every run: dynamic warm-up before, 10-min walking cool-down after; strength work after easy runs. Pace = Controlled, Comfortable, Conversational. Do not skip rest days.</div>
+  <div class="race-banner">Peak: 20 miles on ${fmtDate(dateFor(17, ws(17).longDay))} (3 weeks out) · RACE DAY: Sunday, November 1, 2026 — TCS NYC Marathon, 26.2 miles!</div>`;
+  document.getElementById('printable').innerHTML = html;
+}
+const PRINT_QUOTES = [
+  '"You can do it! Cut his fqn head off!" — Rob Schneider, The Waterboy',
+  '"Go, go, go little legs go!"'
+];
+function exportPDF(){
+  buildPrintable();
+  state.printCount = (state.printCount||0)+1; // next export gets the other quote
+  save();
+  window.print(); // user chooses "Save as PDF" in the dialog
+}
+
+/* ---------------- boot ---------------- */
+function render(){
+  renderHero();
+  if(activeTab==='week') renderWeekView();
+  else if(activeTab==='plan') renderPlanView();
+  else renderProgressView();
+}
+expandedWeeks.add(currentWeekNum());
+render();
+
+// PWA: offline support when served over https (no-op when opened as a local file)
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
