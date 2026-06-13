@@ -1,4 +1,4 @@
-const CACHE = 'dan-nyc-v2';
+const CACHE = 'dan-nyc-v3';
 const ASSETS = ['./', './index.html', './IMG_8712.JPG', './dan.jpeg', './icon-192.png', './icon-512.png', './icon-180.png', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {

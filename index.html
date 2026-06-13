@@ -157,21 +157,7 @@
   .confetti-bit{position:absolute; top:-26px; font-size:16px; animation:cfall linear forwards; pointer-events:none;}
   @keyframes cfall{ to{ transform:translateY(560px) rotate(420deg); opacity:.05; } }
 
-  /* ---------- strava / toast / explorer ---------- */
-  #toast{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#1f2937; color:#fff; padding:10px 18px; border-radius:99px; font-size:13px; z-index:99; opacity:0; transition:opacity .3s; pointer-events:none; max-width:90vw; text-align:center;}
-  #toast.show{opacity:1;}
-  .strava-badge{background:#ffe3d6; color:#c2410c;}
-  .extra-chip{margin-top:5px; font-size:10.5px; font-weight:600; color:#c2410c; background:#fff7ed; border:1px dashed #fdba74; border-radius:7px; padding:3px 6px;}
-  .sv-meta{font-size:10.5px; color:var(--muted); margin-top:3px;}
-  .xp-controls{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
-  .xp-controls label{font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:3px; text-transform:uppercase; letter-spacing:.04em;}
-  .xp-controls select{padding:8px 10px; border:1px solid var(--line); border-radius:9px; font-size:13.5px; font-family:inherit; background:#fff; min-width:130px;}
-  .xp-row{display:flex; align-items:center; gap:10px; padding:6px 0; border-top:1px solid var(--line); font-size:13px;}
-  .xp-row .xp-label{min-width:90px; font-weight:600;}
-  .xp-row .xp-bar{flex:1; height:16px; background:var(--blue-light); border-radius:5px; overflow:hidden;}
-  .xp-row .xp-bar i{display:block; height:100%; background:var(--blue); border-radius:5px;}
-  .xp-row .xp-val{min-width:84px; text-align:right; font-weight:700; color:var(--blue-dark); font-size:12.5px;}
-  .xp-row .xp-n{min-width:50px; text-align:right; color:var(--muted); font-size:11px;}
+  .field select{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:14px; font-family:inherit; background:#fff;}
 
   details.keybox{margin-top:8px;}
   details.keybox summary{cursor:pointer; font-weight:700; font-size:13px; color:var(--blue);}
@@ -201,6 +187,19 @@
     #printable td.p-race{border:3px double #000; font-weight:700;}
     #printable .pkey{margin-top:5px; font-size:8px; color:#333;}
     #printable .race-banner{margin-top:4px; font-weight:800; font-size:10px;}
+    /* roomier layout when printing just two weeks on letter landscape */
+    #printable.two{font-size:12px;}
+    #printable.two h1{font-size:20px; margin-bottom:3px;}
+    #printable.two .psub{font-size:11px; margin-bottom:8px;}
+    #printable.two th{font-size:11px; padding:6px 5px;}
+    #printable.two td{padding:7px 6px; height:170px;}
+    #printable.two .phrow td{height:auto; font-size:11px; padding:4px 6px;}
+    #printable.two td .pd-note{font-size:10px;}
+    #printable.two .pd-tag{font-size:9px; padding:1px 5px;}
+    #printable.two .wklabel{font-size:13px;}
+    #printable.two .miles-cell{font-size:14px;}
+    #printable.two .pkey{font-size:10px; margin-top:10px;}
+    #printable.two .race-banner{font-size:12px; margin-top:6px;}
     tr{page-break-inside:avoid;}
   }
 </style>
@@ -219,9 +218,8 @@
   </header>
 
   <nav class="tabs">
-    <button id="tabWeek" class="active" onclick="setTab('week')">📅 This Week</button>
+    <button id="tabWeek" class="active" onclick="setTab('week')">🏠 Home</button>
     <button id="tabPlan" onclick="setTab('plan')">🗓️ Full Plan</button>
-    <button id="tabProgress" onclick="setTab('progress')">📈 Progress</button>
     <button class="print-btn" onclick="exportPDF()">🖨️ Export PDF</button>
   </nav>
 
@@ -233,35 +231,20 @@
   </div>
 </div>
 
-<!-- log modal -->
+<!-- run check-off modal -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <h3 id="mTitle">Log Run</h3>
+  <div class="modal" style="max-width:360px">
+    <h3 id="mTitle">Run</h3>
     <div class="msub" id="mSub"></div>
     <label class="check-row"><input type="checkbox" id="mDone"><span>Completed ✓</span></label>
-    <div class="pace-display" id="mStravaBox" style="display:none"></div>
     <div class="field">
-      <label>Run Time</label>
-      <input type="text" id="mTime" placeholder="e.g. 45:30 or 1:32:05" inputmode="numeric" oninput="updatePace()">
-      <div class="note">mm:ss or h:mm:ss</div>
-    </div>
-    <div class="field">
-      <label>Distance (miles)</label>
-      <input type="number" id="mDist" step="0.1" min="0" oninput="updatePace()">
-    </div>
-    <div class="pace-display" id="mPaceBox">Pace: <b id="mPaceAuto">—</b></div>
-    <div class="field">
-      <label>Pace (min/mile) — auto-calculated, edit to override</label>
-      <input type="text" id="mPace" placeholder="e.g. 9:45">
-    </div>
-    <div class="field">
-      <label>Notes</label>
-      <textarea id="mNotes" placeholder="How did it feel? Weather, route, fueling…"></textarea>
+      <label>Miles run</label>
+      <input type="number" id="mMiles" step="0.1" min="0" inputmode="decimal">
+      <div class="note">Only change this if the run ended up longer or shorter than planned</div>
     </div>
     <div class="modal-actions">
-      <button class="danger" onclick="clearLog()">Clear</button>
       <button onclick="closeModal()">Cancel</button>
-      <button class="save" onclick="saveLog()">Save</button>
+      <button class="save" onclick="saveMiles()">Save</button>
     </div>
   </div>
 </div>
@@ -293,16 +276,18 @@
 <div class="modal-bg" id="printBg" onclick="if(event.target===this)closePrint()">
   <div class="modal" style="max-width:380px">
     <h3>🖨️ Export PDF</h3>
-    <div class="msub">Choose what to print (black &amp; white friendly)</div>
+    <div class="msub">Prints two weeks per page, black &amp; white friendly</div>
+    <div class="field">
+      <label>Starting week</label>
+      <select id="printStart"></select>
+    </div>
     <div style="display:flex; flex-direction:column; gap:8px">
-      <button class="save" style="padding:12px; border-radius:10px; border:none; background:var(--blue); color:#fff; font-size:14px; font-weight:700; cursor:pointer" onclick="doPrint('two')" id="printTwoBtn">This week + next</button>
+      <button class="save" style="padding:12px; border-radius:10px; border:none; background:var(--blue); color:#fff; font-size:14px; font-weight:700; cursor:pointer" onclick="doPrint('two')">Print selected week + next</button>
       <button style="padding:12px; border-radius:10px; border:1px solid var(--line); background:#fff; font-size:14px; font-weight:600; cursor:pointer" onclick="doPrint('all')">Full 20-week plan</button>
       <button style="padding:10px; border-radius:10px; border:none; background:none; font-size:13px; color:var(--muted); cursor:pointer" onclick="closePrint()">Cancel</button>
     </div>
   </div>
 </div>
-
-<div id="toast"></div>
 
 <!-- print-only schedule -->
 <div id="printable"></div>
@@ -488,7 +473,6 @@ function milestoneStats(){
       runs++; const d=parseFloat(l.dist)||0; miles+=d;
       if(slot==='long' && p.w!==20){ longs++; maxLong=Math.max(maxLong,d); }
     });
-    (st.extras||[]).forEach(x=>{ runs++; miles+=x.strava.distMi||0; });
     if(weekDone(p.w)) weeksDone++;
   });
   const peakDone = !!(ws(17).logs.long && ws(17).logs.long.done);
@@ -590,7 +574,6 @@ function plannedMiles(w){
 function loggedMiles(w){
   const st=ws(w); let m=0;
   Object.values(st.logs).forEach(l=>{ if(l.done && l.dist) m+=parseFloat(l.dist)||0; });
-  (st.extras||[]).forEach(x=>{ m+=x.strava.distMi||0; });
   return m;
 }
 function slotsForWeek(w){
@@ -621,199 +604,24 @@ function slotDay(w, slot){
   return null;
 }
 
-/* ---------------- pace helpers ---------------- */
-function parseTime(str){
-  if(!str) return null;
-  const parts = str.trim().split(':').map(s=>parseInt(s,10));
-  if(parts.some(isNaN)) return null;
-  if(parts.length===3) return parts[0]*3600+parts[1]*60+parts[2];
-  if(parts.length===2) return parts[0]*60+parts[1];
-  if(parts.length===1) return parts[0]*60;
-  return null;
-}
-function fmtPace(secPerMile){
-  if(!isFinite(secPerMile)||secPerMile<=0) return null;
-  const m=Math.floor(secPerMile/60), s=Math.round(secPerMile%60);
-  return m+':'+String(s).padStart(2,'0');
-}
-function calcPace(timeStr, dist){
-  const sec=parseTime(timeStr), d=parseFloat(dist);
-  if(!sec||!d||d<=0) return null;
-  return fmtPace(sec/d);
-}
-
-/* ---------------- Strava integration ----------------
-   Fully client-side: Dan's API codes + tokens live only in this
-   browser's localStorage (never in the published code). */
-const SV_KEY = 'dan-nyc-strava';
-let sv = (()=>{ try{ return JSON.parse(localStorage.getItem(SV_KEY))||{}; }catch(e){ return {}; } })();
-function svSave(){ localStorage.setItem(SV_KEY, JSON.stringify(sv)); }
-function svConnected(){ return !!(sv.refreshToken && sv.clientId && sv.clientSecret); }
-
-let toastTimer=null;
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 4000);
-}
-
-function stravaConnect(){
-  const id=document.getElementById('svId').value.trim();
-  const sec=document.getElementById('svSecret').value.trim();
-  if(!id || !sec){ toast('Paste both codes from Strava first'); return; }
-  sv.clientId=id; sv.clientSecret=sec; sv.error=null; svSave();
-  const ru = location.origin + location.pathname;
-  location.href = 'https://www.strava.com/oauth/authorize?client_id='+encodeURIComponent(id)
-    +'&redirect_uri='+encodeURIComponent(ru)+'&response_type=code&scope=activity:read_all&approval_prompt=auto';
-}
-function stravaDisconnect(){
-  if(!confirm('Disconnect Strava? Already-synced runs stay saved.')) return;
-  sv={clientId:sv.clientId, clientSecret:sv.clientSecret}; svSave(); render();
-}
-async function svToken(body){
-  const r = await fetch('https://www.strava.com/oauth/token', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-  if(!r.ok) throw new Error('Strava connection failed ('+r.status+') — check the two codes and try again');
-  return r.json();
-}
-async function svHandleRedirect(){
-  const code = new URLSearchParams(location.search).get('code');
-  if(!code) return;
-  history.replaceState({},'',location.pathname);
-  if(!sv.clientId || !sv.clientSecret) return;
-  try{
-    const d = await svToken({client_id:sv.clientId, client_secret:sv.clientSecret, code, grant_type:'authorization_code'});
-    sv.accessToken=d.access_token; sv.refreshToken=d.refresh_token; sv.expiresAt=d.expires_at;
-    sv.athlete = d.athlete ? (d.athlete.firstname+' '+(d.athlete.lastname||'')).trim() : '';
-    sv.error=null; svSave();
-    toast('Strava connected! Syncing runs…');
-    await stravaSync(true);
-  }catch(e){ sv.error=e.message; svSave(); render(); }
-}
-async function svAccess(){
-  if(!svConnected()) throw new Error('Not connected to Strava');
-  if(!sv.accessToken || Date.now()/1000 > (sv.expiresAt||0)-300){
-    const d = await svToken({client_id:sv.clientId, client_secret:sv.clientSecret, refresh_token:sv.refreshToken, grant_type:'refresh_token'});
-    sv.accessToken=d.access_token; sv.refreshToken=d.refresh_token; sv.expiresAt=d.expires_at; svSave();
-  }
-  return sv.accessToken;
-}
-function secsToClock(s){
-  s=Math.round(s);
-  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
-  return h ? h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0') : m+':'+String(sec).padStart(2,'0');
-}
-function actToData(a){
-  const mi = a.distance/1609.344;
-  return {
-    id:a.id, name:a.name||'Run', date:(a.start_date_local||'').slice(0,10),
-    distMi:+mi.toFixed(2), movingSec:a.moving_time, elapsedSec:a.elapsed_time,
-    time:secsToClock(a.moving_time||0),
-    pace: mi>0 && a.moving_time ? fmtPace(a.moving_time/mi) : null,
-    avgHr: a.average_heartrate ? Math.round(a.average_heartrate) : null,
-    maxHr: a.max_heartrate ? Math.round(a.max_heartrate) : null,
-    cadence: a.average_cadence ? Math.round(a.average_cadence*2) : null,   // Strava reports per-leg
-    elevFt: a.total_elevation_gain ? Math.round(a.total_elevation_gain*3.28084) : null,
-    sufferScore: a.suffer_score || null
-  };
-}
-async function stravaSync(silent){
-  try{
-    sv.error=null;
-    const tok = await svAccess();
-    let acts=[], page=1;
-    while(page<=4){
-      const r = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=100&page='+page
-        +'&after='+Math.floor(PLAN_START.getTime()/1000), {headers:{Authorization:'Bearer '+tok}});
-      if(!r.ok) throw new Error('Strava sync failed ('+r.status+')');
-      const batch = await r.json();
-      acts = acts.concat(batch);
-      if(batch.length<100) break;
-      page++;
-    }
-    const runs = acts.filter(a=>/Run/i.test(a.sport_type||a.type||''));
-    runs.sort((a,b)=> new Date(a.start_date_local)-new Date(b.start_date_local));
-    // ids already stored anywhere
-    const used = new Set();
-    PLAN.forEach(p=>{ const st=ws(p.w);
-      Object.values(st.logs).forEach(l=>{ if(l.strava) used.add(l.strava.id); });
-      (st.extras||[]).forEach(x=> used.add(x.strava.id));
-    });
-    let added=0;
-    runs.forEach(a=>{
-      const data = actToData(a);
-      const d = new Date(data.date+'T12:00:00');
-      const diff = Math.floor((d - PLAN_START)/864e5);
-      if(diff<0 || diff>=140) return;
-      const w = Math.floor(diff/7)+1, dayKey = DAY_KEYS[diff%7];
-      const st = ws(w);
-      if(used.has(data.id)){
-        Object.values(st.logs).forEach(l=>{ if(l.strava && l.strava.id===data.id) l.strava=data; });
-        (st.extras||[]).forEach(x=>{ if(x.strava.id===data.id) x.strava=data; });
-        return;
-      }
-      let slot = null;
-      const cell = weekSchedule(w)[dayKey];
-      if(cell && cell.slot && !(st.logs[cell.slot] && st.logs[cell.slot].strava)) slot = cell.slot;
-      if(!slot) slot = adoptSlot(w, dayKey, data);   // flexible-day matching
-      if(slot){
-        const prev = st.logs[slot]||{};
-        st.logs[slot] = {done:true, time:data.time, dist:String(data.distMi), pace:data.pace||'', notes:prev.notes||'', strava:data};
-      } else {
-        st.extras = st.extras||[];
-        st.extras.push({day:dayKey, strava:data});
-      }
-      used.add(data.id); added++;
-    });
-    sv.lastSync = Date.now(); svSave(); save();
-    render();
-    if(added>0) checkMilestones();
-    if(!silent) toast(added>0 ? added+' run'+(added===1?'':'s')+' synced from Strava ⌚' : 'Up to date — no new runs');
-  }catch(e){
-    sv.error = e.message; svSave(); render();
-    if(!silent) toast('Sync problem: '+e.message);
-  }
-}
-// If a run happened on a day with nothing planned, see if an unfilled planned
-// run that week should simply move to that day (the app's whole point: flexible days).
-function adoptSlot(w, dayKey, data){
-  const st = ws(w), p = PLAN[w-1];
-  const open = slot => !(st.logs[slot] && (st.logs[slot].done || st.logs[slot].strava));
-  if(['mon','tue','wed','thu'].includes(dayKey) && w!==1){
-    const cands = [];
-    if(p.runA && open('runA')) cands.push({slot:'runA', planned:p.runA.miles||p.runA.estMiles||0, dayProp:'dayA'});
-    if(p.runB && open('runB')) cands.push({slot:'runB', planned:p.runB.miles||p.runB.estMiles||0, dayProp:'dayB'});
-    cands.sort((a,b)=> Math.abs(a.planned-data.distMi)-Math.abs(b.planned-data.distMi));
-    const best = cands[0];
-    if(best && Math.abs(best.planned-data.distMi) <= Math.max(1.5, best.planned*0.35)){
-      const otherProp = best.dayProp==='dayA' ? 'dayB' : 'dayA';
-      if(st[otherProp] !== dayKey){ st[best.dayProp]=dayKey; return best.slot; }
-    }
-  }
-  if((dayKey==='sat'||dayKey==='sun') && w!==20 && open('long') && st.longDay!==dayKey
-     && data.distMi >= Math.max(5, (p.long.miles||10)*0.5)){
-    st.longDay = dayKey; return 'long';
-  }
-  if(w===1 && ['wed','thu'].includes(dayKey) && open('runB')){ st.dayB=dayKey; return 'runB'; }
-  return null;
-}
-
 /* ---------------- rendering ---------------- */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function renderHero(){
   const cw = currentWeekNum();
   const totalDone = PLAN.filter(p=>weekDone(p.w)).length;
-  let miles=0; PLAN.forEach(p=>{ miles+=loggedMiles(p.w); });
+  let done=0, total=0;
+  PLAN.forEach(p=>{ const st=ws(p.w); slotsForWeek(p.w).filter(x=>x!=='recovery').forEach(x=>{ total++; if(st.logs[x]&&st.logs[x].done) done++; }); });
   document.getElementById('heroStats').innerHTML = `
     <div class="hero-stat"><b>${daysToRace()}</b><span>days to race</span></div>
     <div class="hero-stat"><b>Week ${cw}/20</b><span>${esc(PHASES[PLAN[cw-1].phase].name)}</span></div>
-    <div class="hero-stat"><b>${miles.toFixed(1)} mi</b><span>logged so far</span></div>
+    <div class="hero-stat"><b>${total?Math.round(done/total*100):0}%</b><span>training complete</span></div>
     <div class="hero-stat"><b>${totalDone}/20</b><span>weeks completed</span></div>`;
 }
 
 function setTab(t){
   activeTab=t;
-  ['week','plan','progress'].forEach(x=>{
+  ['week','plan'].forEach(x=>{
     document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active', x===t);
   });
   render();
@@ -882,23 +690,18 @@ function dayGridHTML(w){
       else cls+=' run';
       if(log && log.done) cls+=' done';
       body=`<div class="dwhat">${esc(cell.info.what)}</div><div class="ddetail">${esc(cell.info.detail||'')}</div>`;
-      if(log && log.done){
-        const bits=[];
-        if(log.time) bits.push(log.time);
-        if(log.pace) bits.push(log.pace+'/mi');
-        if(log.dist) bits.push(log.dist+' mi');
-        body+=`<div class="logline">${log.strava?'⌚':''}✓ ${esc(bits.join(' · '))||'Done'}</div>`;
-        if(log.strava && log.strava.avgHr) body+=`<div class="sv-meta">♥ ${log.strava.avgHr} bpm avg</div>`;
+      if(slot){
+        if(log && log.done){
+          body+=`<button class="logbtn logged" onclick="openModal(${w},'${slot}')">✓ Done · ${esc(log.dist)} mi</button>`;
+        } else {
+          body+=`<button class="logbtn" onclick="markDone(${w},'${slot}')">Mark done ✓</button>`;
+        }
       }
-      if(slot) body+=`<button class="logbtn ${log&&log.done?'logged':''}" onclick="openModal(${w},'${slot}')">${log&&log.done?'✓ Edit log':'Log run'}</button>`;
     } else if(cell.info && cell.info.rest){
       body=`<div class="dwhat">🛌 ${esc(cell.info.what)}</div><div class="ddetail">${esc(cell.info.detail||'')}</div>`;
     } else {
       body=`<div class="dwhat" style="color:var(--muted);font-weight:600">Rest</div><div class="ddetail">Recovery is training too</div>`;
     }
-    (st.extras||[]).filter(x=>x.day===k).forEach(x=>{
-      body+=`<div class="extra-chip">⌚ Extra: ${x.strava.distMi} mi · ${esc(x.strava.time)}</div>`;
-    });
     html+=`<div class="${cls}"><div class="dname"><span>${DAY_SHORT[k]}</span><span>${fmtDate(d)}</span></div>${body}</div>`;
   });
   return html+'</div>';
@@ -912,7 +715,7 @@ function weekCardInner(w, withPickers){
   if(withPickers) html+=dayPickersHTML(w);
   html+=dayGridHTML(w);
   let milesLine = `Planned: <b>${pm.approx?'≈':''}${pm.miles.toFixed(1).replace(/\.0$/,'')} mi</b>`;
-  if(lm>0) milesLine += ` · Logged: <b style="color:var(--green)">${lm.toFixed(1).replace(/\.0$/,'')} mi</b>`;
+  if(lm>0) milesLine += ` · Done: <b style="color:var(--green)">${lm.toFixed(1).replace(/\.0$/,'')} mi</b>`;
   html+=`<div class="hint" style="margin-top:10px">${milesLine}${pm.approx?' <span style="opacity:.7">(≈ includes time-based workouts estimated at easy effort)</span>':''}</div>`;
   if(p.bonus) html+=`<div class="hint">➕ ${esc(p.bonus)}</div>`;
   return html;
@@ -937,14 +740,17 @@ function renderWeekView(){
     html+=`<div class="card sunday-banner"><h2>🚀 Training starts ${d<=1?'tomorrow':'in '+d+' days'} — Monday, June 15</h2>
       <div class="hint">First run: <b>Wednesday, June 17</b>. Set up week 1 below, and check out the full 20-week plan in the Full Plan tab.</div></div>`;
   }
-  if(isSunday() && cw<20 && !beforeStart){
-    const nw = cw+1;
-    html+=`<div class="card sunday-banner"><h2>🗓️ It's Sunday — plan next week! <span class="badge speed">Week ${nw}</span></h2>
-      <div class="hint" style="margin-bottom:4px">Pick which days work for Dan's schedule next week (${fmtRange(nw)}):</div>
-      ${dayPickersHTML(nw)}${dayGridHTML(nw)}</div>`;
-  }
-  html+=`<div class="card"><h2>Week ${cw} <span class="hint" style="margin:0">· ${fmtRange(cw)} ·</span> ${phaseBadges(p)}</h2>
+  // current week
+  html+=`<div class="card"><h2>This Week · Week ${cw} <span class="hint" style="margin:0">· ${fmtRange(cw)} ·</span> ${phaseBadges(p)}</h2>
     ${weekCardInner(cw,true)}</div>`;
+  // next week (always shown, highlighted on Sundays)
+  if(cw<20){
+    const nw = cw+1;
+    const sun = isSunday() && !beforeStart;
+    html+=`<div class="card ${sun?'sunday-banner':''}"><h2>${sun?'🗓️ It\'s Sunday — plan ':'Next Week · '}Week ${nw} <span class="hint" style="margin:0">· ${fmtRange(nw)} ·</span> ${phaseBadges(PLAN[nw-1])}</h2>
+      ${sun?'<div class="hint" style="margin-bottom:4px">Pick which days work for Dan\'s schedule next week:</div>':''}
+      ${weekCardInner(nw,true)}</div>`;
+  }
   // coach's notes
   html+=`<div class="card"><details class="keybox"><summary>📖 Coach's Key — warm-ups, pacing &amp; the 3 C's</summary><div class="kbody">
     <p><b>Warm up (non-negotiable):</b> dynamic moves before every run — leg swings, lunges, arm circles, hip rolls. If pressed for time, cut the run short, not the warm-up.</p>
@@ -957,14 +763,13 @@ function renderWeekView(){
     <p><b>Rest days:</b> the most important day in training. Do not skip them. Sleep 7+ hours.</p>
   </div></details></div>`;
   // how-to guide
-  html+=`<div class="card"><details class="keybox"><summary>❓ How this app works (60-second guide)</summary><div class="kbody">
+  html+=`<div class="card"><details class="keybox"><summary>❓ How this app works (30-second guide)</summary><div class="kbody">
     <p><b>The routine:</b> Open the app on Sunday → pick which days you'll run next week (tap the day chips) → done. During the week, just run.</p>
-    <p><b>Your runs log themselves:</b> with Strava connected, every run from the watch appears here automatically — time, pace, heart rate, the works. Open a run to add notes. No watch that day? Tap "Log run" and type it in.</p>
-    <p><b>Flexible days:</b> ran Tuesday instead of Monday? Long run on Sunday instead of Saturday? The app notices and moves the plan to match — no fixing needed.</p>
-    <p><b>Tabs:</b> <b>This Week</b> = today's marching orders. <b>Full Plan</b> = all 20 weeks. <b>Progress</b> = stats, the Stats Explorer (pick any stat, group it any way — play with it!), and your full run log.</p>
-    <p><b>Print it:</b> Export PDF prints this week + next by default (fridge-friendly), or the full plan.</p>
-    <p><b>Connect Strava (one-time, ~3 min):</b> ① In a browser go to <b>strava.com/settings/api</b> and log in. ② Fill the short form — name it anything (e.g. "Dan's Plan"), website <b>https://bethtech17.github.io</b>, Authorization Callback Domain <b>bethtech17.github.io</b>. ③ Copy the <b>Client ID</b> and <b>Client Secret</b> it shows you. ④ In this app: Progress tab → paste both → "Connect to Strava" → tap Authorize. That's it, forever.</p>
-    <p><b>One rule:</b> always open the app from the home-screen icon (not Safari) — that's where your data lives.</p>
+    <p><b>Checking off a run:</b> tap <b>Mark done ✓</b> on the day you ran. That's it. If the run was longer or shorter than planned, tap it again to adjust the miles.</p>
+    <p><b>Flexible days:</b> pick your 2 weekday runs (Mon–Thu) and whether the long run is Saturday or Sunday. The Friday run is fixed. Change them anytime up top.</p>
+    <p><b>Two tabs:</b> <b>Home</b> = this week + next week, plus your overall progress. <b>Full Plan</b> = all 20 weeks at a glance.</p>
+    <p><b>Print it:</b> Export PDF prints two weeks per page (pick the starting week), or the full plan.</p>
+    <p><b>One rule:</b> always open the app from the home-screen icon (not Safari) — that's where your progress is saved.</p>
   </div></details></div>`;
   // dedication
   html+=`<div class="card dedication">
@@ -987,7 +792,7 @@ function renderPlanView(){
     <div style="flex:4;background:var(--speed)">Speed 9–12</div>
     <div style="flex:5;background:var(--marathon)">Marathon 13–17</div>
     <div style="flex:3;background:var(--taper)">Taper 18–20</div>
-  </div><div class="hint">Long runs build 7 → 20 miles with cutback weeks to absorb training. Peak 20-miler lands Oct 17/18 — exactly 3 weeks before race day. Tap any week to choose days &amp; log runs.</div></div>`;
+  </div><div class="hint">Long runs build 7 → 20 miles with cutback weeks to absorb training. Peak 20-miler lands Oct 17/18 — exactly 3 weeks before race day. Tap any week to choose days &amp; check off runs.</div></div>`;
   PLAN.forEach(p=>{
     const w=p.w, st=ws(w), pm=plannedMiles(w);
     const open = expandedWeeks.has(w);
@@ -1018,230 +823,40 @@ function renderPlanView(){
 }
 function toggleWeek(w){ expandedWeeks.has(w)?expandedWeeks.delete(w):expandedWeeks.add(w); render(); }
 
-/* ----- Stats Explorer (mini pivot table) ----- */
-let explorer = {metric:'miles', group:'week', agg:'total'};
-function parsePaceStr(p){ const s=parseTime(p); return s||null; }
-function slotType(p, slot){
-  if(slot==='runA') return 'Easy run';
-  if(slot==='runB') return (p.runB && p.runB.workout) ? 'Workout' : 'Easy run';
-  if(slot==='fri') return 'Friday run';
-  if(slot==='long') return p.w===20 ? 'Race' : 'Long run';
-  if(slot==='recovery') return 'Recovery';
-  return 'Run';
-}
-function allRunRecords(){
-  const rows=[];
-  PLAN.forEach(p=>{
-    const st=ws(p.w);
-    slotsForWeek(p.w).forEach(s=>{
-      const l=st.logs[s];
-      if(!l||!l.done) return;
-      const day=slotDay(p.w,s);
-      const date = day ? dateFor(p.w,day) : weekStartDate(p.w);
-      const miles=parseFloat(l.dist)||0, secs=parseTime(l.time)||0;
-      rows.push({
-        week:p.w, phase:PHASES[p.phase].name, type:slotType(p,s),
-        month:date.toLocaleDateString('en-US',{month:'short'}),
-        dow:date.toLocaleDateString('en-US',{weekday:'short'}),
-        miles, mins:secs?secs/60:null,
-        paceSec: miles>0&&secs ? secs/miles : parsePaceStr(l.pace),
-        avgHr:l.strava?l.strava.avgHr:null, maxHr:l.strava?l.strava.maxHr:null,
-        elevFt:l.strava?l.strava.elevFt:null, cadence:l.strava?l.strava.cadence:null
-      });
-    });
-    (st.extras||[]).forEach(x=>{
-      const date=dateFor(p.w,x.day), s=x.strava;
-      rows.push({week:p.w, phase:PHASES[p.phase].name, type:'Extra run',
-        month:date.toLocaleDateString('en-US',{month:'short'}),
-        dow:date.toLocaleDateString('en-US',{weekday:'short'}),
-        miles:s.distMi||0, mins:s.movingSec?s.movingSec/60:null,
-        paceSec: s.distMi>0&&s.movingSec ? s.movingSec/s.distMi : null,
-        avgHr:s.avgHr, maxHr:s.maxHr, elevFt:s.elevFt, cadence:s.cadence});
-    });
-  });
-  return rows;
-}
-const XP_METRICS = {
-  miles:{label:'Miles', get:r=>r.miles||null, fmt:v=>v.toFixed(1)+' mi'},
-  mins:{label:'Time', get:r=>r.mins, fmt:v=>Math.round(v)+' min'},
-  pace:{label:'Pace', get:r=>r.paceSec, fmt:v=>fmtPace(v)+'/mi', avgish:true, lowerBetter:true},
-  avgHr:{label:'Avg Heart Rate', get:r=>r.avgHr, fmt:v=>Math.round(v)+' bpm', avgish:true},
-  maxHr:{label:'Max Heart Rate', get:r=>r.maxHr, fmt:v=>Math.round(v)+' bpm', avgish:true},
-  elevFt:{label:'Elevation Gain', get:r=>r.elevFt, fmt:v=>Math.round(v)+' ft'},
-  cadence:{label:'Cadence', get:r=>r.cadence, fmt:v=>Math.round(v)+' spm', avgish:true},
-  count:{label:'Number of Runs', get:()=>1, fmt:v=>String(Math.round(v))}
-};
-const XP_GROUPS = {
-  week:{label:'Week', key:r=>'Wk '+r.week, sort:(a,b)=>parseInt(a.slice(3))-parseInt(b.slice(3))},
-  month:{label:'Month', key:r=>r.month, sort:(a,b)=>['Jun','Jul','Aug','Sep','Oct','Nov'].indexOf(a)-['Jun','Jul','Aug','Sep','Oct','Nov'].indexOf(b)},
-  phase:{label:'Phase', key:r=>r.phase, sort:(a,b)=>{const o=['Base Building','Hill Training','Speed Training','Marathon Specific','Taper'];return o.indexOf(a)-o.indexOf(b);}},
-  type:{label:'Run type', key:r=>r.type, sort:(a,b)=>a.localeCompare(b)},
-  dow:{label:'Day of week', key:r=>r.dow, sort:(a,b)=>['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(a)-['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(b)}
-};
-function setExplorer(k,v){ explorer[k]=v; render(); }
-function explorerHTML(){
-  const rows = allRunRecords();
-  const M = XP_METRICS[explorer.metric], G = XP_GROUPS[explorer.group];
-  let agg = explorer.agg;
-  if(M.avgish && agg==='total') agg='avg';   // "total pace" makes no sense
-  const sel = (id,opts,cur)=>`<div><label>${id==='metric'?'Show me':id==='group'?'Grouped by':'As'}</label>
-    <select onchange="setExplorer('${id}', this.value)">${opts.map(([v,l])=>`<option value="${v}" ${v===cur?'selected':''}>${l}</option>`).join('')}</select></div>`;
-  let html = `<div class="card"><h2>🧮 Stats Explorer <span class="hint" style="margin:0">· mix &amp; match like a pivot table</span></h2>
-  <div class="xp-controls">
-    ${sel('metric', Object.entries(XP_METRICS).map(([k,m])=>[k,m.label]), explorer.metric)}
-    ${sel('group', Object.entries(XP_GROUPS).map(([k,g])=>[k,g.label]), explorer.group)}
-    ${sel('agg', [['total','Total'],['avg','Average'],['best','Best']], explorer.agg)}
-  </div>`;
-  const buckets = {};
-  rows.forEach(r=>{
-    const v = M.get(r);
-    if(v==null) return;
-    const k = G.key(r);
-    (buckets[k]=buckets[k]||[]).push(v);
-  });
-  const keys = Object.keys(buckets).sort(G.sort);
-  if(keys.length===0){
-    html += `<div class="hint">No data yet — once runs are logged (or synced from the watch), this comes alive. Heart rate, cadence and elevation need Strava sync.</div></div>`;
-    return html;
-  }
-  const calc = vals=>{
-    if(agg==='total') return vals.reduce((a,b)=>a+b,0);
-    if(agg==='avg') return vals.reduce((a,b)=>a+b,0)/vals.length;
-    return M.lowerBetter ? Math.min(...vals) : Math.max(...vals);
-  };
-  const results = keys.map(k=>({k, v:calc(buckets[k]), n:buckets[k].length}));
-  const maxV = Math.max(...results.map(r=>r.v));
-  html += results.map(r=>`<div class="xp-row">
-    <span class="xp-label">${esc(r.k)}</span>
-    <span class="xp-bar"><i style="width:${maxV>0?Math.max(3,Math.round(r.v/maxV*100)):0}%"></i></span>
-    <span class="xp-val">${M.fmt(r.v)}</span>
-    <span class="xp-n">${r.n} run${r.n===1?'':'s'}</span>
-  </div>`).join('');
-  html += `<div class="hint" style="margin-top:8px">${agg==='avg'?'Averages':agg==='best'?'Best values':'Totals'} per ${G.label.toLowerCase()} · based on ${rows.length} logged runs</div></div>`;
-  return html;
-}
-
-/* ----- Strava card ----- */
-function stravaCardHTML(){
-  if(svConnected()){
-    return `<div class="card"><h2>⌚ Strava <span class="badge strava-badge">Connected${sv.athlete?' · '+esc(sv.athlete):''}</span></h2>
-      <div class="hint">Runs from the COROS watch land here automatically (synced on every app open). Last sync: ${sv.lastSync? new Date(sv.lastSync).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'never'}.</div>
-      ${sv.error?`<div class="warn">⚠️ ${esc(sv.error)}</div>`:''}
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <button class="chip sel" onclick="stravaSync(false)">🔄 Sync now</button>
-        <button class="chip" onclick="stravaDisconnect()">Disconnect</button>
-      </div></div>`;
-  }
-  return `<div class="card"><h2>⌚ Connect Strava <span class="badge cutback">One-time setup</span></h2>
-    <div class="hint">Connect once and every run from the COROS watch fills itself in — time, pace, heart rate, everything. The two codes come from Dan's Strava API page (steps in the guide on the This Week tab). They stay on this phone only.</div>
-    <div class="field" style="margin-top:10px"><label>Client ID</label><input type="text" id="svId" inputmode="numeric" value="${esc(sv.clientId||'')}" placeholder="short number, e.g. 123456" oninput="sv.clientId=this.value.trim();svSave()"></div>
-    <div class="field"><label>Client Secret</label><input type="text" id="svSecret" value="${esc(sv.clientSecret||'')}" placeholder="long code" oninput="sv.clientSecret=this.value.trim();svSave()"></div>
-    <button class="chip sel" style="padding:10px 18px;font-size:13px" onclick="stravaConnect()">Connect to Strava →</button>
-    ${sv.error?`<div class="warn">⚠️ ${esc(sv.error)}</div>`:''}
-  </div>`;
-}
-
-/* ----- Progress view ----- */
-function renderProgressView(){
-  let runsDone=0, totalRuns=0, miles=0, longCount=0;
-  const rows=[];
-  PLAN.forEach(p=>{
-    const w=p.w, st=ws(w);
-    const slots = slotsForWeek(w);
-    totalRuns += slots.filter(s=>s!=='recovery').length;
-    slots.forEach(s=>{
-      const l=st.logs[s];
-      if(l&&l.done){ runsDone++; miles+= parseFloat(l.dist)||0; if(s==='long')longCount++;
-        rows.push({w, slot:s, day:slotDay(w,s), log:l, info:slotInfo(w,s)});
-      }
-    });
-    (st.extras||[]).forEach((x,i)=>{
-      runsDone++; miles+=x.strava.distMi||0;
-      rows.push({w, slot:null, day:x.day, log:{time:x.strava.time, dist:String(x.strava.distMi), pace:x.strava.pace, notes:x.strava.name, strava:x.strava}, info:{what:'Extra run'}});
-    });
-  });
-  let html = stravaCardHTML();
-  html+=`<div class="card"><h2>📈 Training Progress</h2><div class="stat-grid">
-    <div class="stat-box"><b>${runsDone}</b><span>runs completed</span></div>
-    <div class="stat-box"><b>${miles.toFixed(1)}</b><span>miles logged</span></div>
-    <div class="stat-box"><b>${totalRuns?Math.round(Math.min(runsDone,totalRuns)/totalRuns*100):0}%</b><span>of plan done</span></div>
-    <div class="stat-box"><b>${longCount}</b><span>long runs done</span></div>
-  </div></div>`;
-  html += explorerHTML();
-  html+=`<div class="card"><h2>🏃 Run Log</h2>`;
-  if(rows.length===0){
-    html+=`<div class="hint">No runs logged yet. Log your first run from the This Week tab — or connect Strava above and they'll appear on their own!</div>`;
-  } else {
-    rows.sort((a,b)=> (a.w-b.w) || DAY_KEYS.indexOf(a.day)-DAY_KEYS.indexOf(b.day));
-    html+=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
-      <tr style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase">
-      <th style="padding:6px">Date</th><th>Run</th><th>Time</th><th>Dist</th><th>Pace</th><th>HR</th><th>Notes</th><th></th></tr>`;
-    rows.forEach(r=>{
-      const d = r.day ? fmtDate(dateFor(r.w, r.day)) : 'Wk '+r.w;
-      const hr = r.log.strava && r.log.strava.avgHr ? r.log.strava.avgHr : null;
-      html+=`<tr style="border-top:1px solid var(--line)">
-        <td style="padding:7px 6px;white-space:nowrap">${esc(d)} <span style="color:var(--muted)">w${r.w}</span></td>
-        <td>${r.log.strava?'⌚ ':''}${esc(r.info?r.info.what:'Run')}</td>
-        <td>${esc(r.log.time||'—')}</td>
-        <td>${r.log.dist?esc(r.log.dist)+' mi':'—'}</td>
-        <td>${esc(r.log.pace||'—')}</td>
-        <td>${hr?hr+'':'—'}</td>
-        <td style="max-width:220px;color:var(--muted)">${esc(r.log.notes||'')}</td>
-        <td>${r.slot?`<button class="logbtn" style="padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:11px" onclick="openModal(${r.w},'${r.slot}')">Edit</button>`:''}</td></tr>`;
-    });
-    html+=`</table></div>`;
-  }
-  html+=`</div>`;
-  document.getElementById('view').innerHTML = html;
-}
-
 /* ---------------- modal ---------------- */
+// planned miles for a single slot (the default when checking off)
+function slotMiles(w, slot){
+  const info = slotInfo(w,slot);
+  if(!info) return 0;
+  return info.miles!=null ? info.miles : (info.estMiles||0);
+}
+// one tap from the day cell: mark complete with the planned mileage
+function markDone(w, slot){
+  const st=ws(w);
+  const prev = st.logs[slot]||{};
+  st.logs[slot] = {done:true, dist: prev.dist!=null ? prev.dist : String(slotMiles(w,slot))};
+  save(); render(); checkMilestones();
+}
+// open the editor to un-check a run or adjust its mileage
 function openModal(w, slot){
   modalCtx = {w, slot};
   const info = slotInfo(w,slot), st=ws(w), log = st.logs[slot]||{};
   const day = slotDay(w,slot);
-  document.getElementById('mTitle').textContent = (w===20&&slot==='long') ? '🏁 Log the Marathon!' : 'Log: '+(info?info.what:'Run');
+  document.getElementById('mTitle').textContent = (w===20&&slot==='long') ? '🏁 The Marathon!' : (info?info.what:'Run');
   document.getElementById('mSub').textContent = `Week ${w} · ${day?DAY_NAMES[day]+', '+fmtDate(dateFor(w,day)):''}`;
   document.getElementById('mDone').checked = !!log.done;
-  document.getElementById('mTime').value = log.time||'';
-  document.getElementById('mDist').value = log.dist!=null?log.dist:(info&&info.miles!=null?info.miles:(info&&info.estMiles?info.estMiles:''));
-  document.getElementById('mPace').value = log.pace||'';
-  document.getElementById('mNotes').value = log.notes||'';
-  const svb = document.getElementById('mStravaBox');
-  if(log.strava){
-    const s=log.strava, bits=[];
-    if(s.avgHr) bits.push('♥ '+s.avgHr+' avg / '+(s.maxHr||'—')+' max bpm');
-    if(s.cadence) bits.push(s.cadence+' spm');
-    if(s.elevFt) bits.push(s.elevFt+' ft elev');
-    svb.innerHTML = `⌚ <b>From Strava:</b> ${esc(s.name)}${bits.length?'<br>'+esc(bits.join(' · ')):''}`;
-    svb.style.display='block';
-  } else svb.style.display='none';
-  updatePace();
+  document.getElementById('mMiles').value = log.dist!=null ? log.dist : slotMiles(w,slot);
   document.getElementById('modalBg').classList.add('open');
 }
-function updatePace(){
-  const p = calcPace(document.getElementById('mTime').value, document.getElementById('mDist').value);
-  document.getElementById('mPaceAuto').textContent = p ? p+' /mi' : '—';
-  if(p) document.getElementById('mPace').value = p;
-}
-function saveLog(){
+function saveMiles(){
   if(!modalCtx) return;
   const {w,slot}=modalCtx, st=ws(w);
-  st.logs[slot] = {
-    done: document.getElementById('mDone').checked,
-    time: document.getElementById('mTime').value.trim(),
-    dist: document.getElementById('mDist').value,
-    pace: document.getElementById('mPace').value.trim(),
-    notes: document.getElementById('mNotes').value.trim()
-  };
+  const done = document.getElementById('mDone').checked;
+  const miles = document.getElementById('mMiles').value;
+  if(!done && !st.logs[slot]){ closeModal(); return; }
+  st.logs[slot] = {done, dist: miles};
   save(); closeModal(); render();
-  if(st.logs[slot].done) checkMilestones();
-}
-function clearLog(){
-  if(!modalCtx) return;
-  const {w,slot}=modalCtx;
-  delete ws(w).logs[slot];
-  save(); closeModal(); render();
+  if(done) checkMilestones();
 }
 function closeModal(){ modalCtx=null; document.getElementById('modalBg').classList.remove('open'); }
 
@@ -1274,7 +889,7 @@ function buildPrintable(from=1, to=20){
         const cls = isRace?'p-race': c.slot==='long'?'p-long': (c.info.workout?'p-workout':'p-run');
         const tag = isRace?'RACE DAY': c.slot==='long'?'LONG RUN': (c.info.workout?'WORKOUT':'');
         const log = c.slot? st.logs[c.slot]:null;
-        html+=`<td class="${cls}">${tag?`<div class="pd-tag">${tag}</div>`:''}<div class="pd-what">${esc(c.info.what)}</div><div class="pd-note">${esc(c.info.detail||'')}</div>${log&&log.done?`<div class="pd-note">✓ ${esc(log.time||'')} ${esc(log.pace?log.pace+'/mi':'')}</div>`:''}</td>`;
+        html+=`<td class="${cls}">${tag?`<div class="pd-tag">${tag}</div>`:''}<div class="pd-what">${esc(c.info.what)}</div><div class="pd-note">${esc(c.info.detail||'')}</div>${log&&log.done?`<div class="pd-note">✓ done${log.dist!=null?' · '+esc(log.dist)+' mi':''}</div>`:''}</td>`;
       } else if(c.info && c.info.rest){
         html+=`<td><div class="pd-what">REST</div><div class="pd-note">pre-race rest</div></td>`;
       } else {
@@ -1287,7 +902,9 @@ function buildPrintable(from=1, to=20){
   <div class="pkey"><b>Key:</b> WORKOUT = hills/speed/tempo session · LONG RUN cells have a heavy outline · RACE DAY has a double outline · ≈ = includes time-based workout estimated at easy effort.
   Every run: dynamic warm-up before, 10-min walking cool-down after; strength work after easy runs. Pace = Controlled, Comfortable, Conversational. Do not skip rest days.</div>
   <div class="race-banner">Peak: 20 miles on ${fmtDate(dateFor(17, ws(17).longDay))} (3 weeks out) · RACE DAY: Sunday, November 1, 2026 — TCS NYC Marathon, 26.2 miles!</div>`;
-  document.getElementById('printable').innerHTML = html;
+  const el = document.getElementById('printable');
+  el.className = (to-from)<=1 ? 'two' : '';
+  el.innerHTML = html;
 }
 const PRINT_QUOTES = [
   '"You can do it! Cut his fqn head off!" — Rob Schneider, The Waterboy',
@@ -1295,13 +912,19 @@ const PRINT_QUOTES = [
 ];
 function exportPDF(){
   const cw = Math.min(currentWeekNum(), 19);
-  document.getElementById('printTwoBtn').textContent = `This week + next (Weeks ${cw}–${cw+1})`;
+  const sel = document.getElementById('printStart');
+  sel.innerHTML = PLAN.filter(p=>p.w<=19).map(p=>
+    `<option value="${p.w}" ${p.w===cw?'selected':''}>Weeks ${p.w} & ${p.w+1} — starts ${fmtDate(weekStartDate(p.w))}</option>`
+  ).join('');
   document.getElementById('printBg').classList.add('open');
 }
 function closePrint(){ document.getElementById('printBg').classList.remove('open'); }
 function doPrint(mode){
   closePrint();
-  if(mode==='two'){ const cw = Math.min(currentWeekNum(), 19); buildPrintable(cw, cw+1); }
+  if(mode==='two'){
+    const start = Math.min(parseInt(document.getElementById('printStart').value,10)||currentWeekNum(), 19);
+    buildPrintable(start, start+1);
+  }
   else buildPrintable();
   state.printCount = (state.printCount||0)+1; // next export gets the other quote
   save();
@@ -1312,16 +935,10 @@ function doPrint(mode){
 function render(){
   renderHero();
   if(activeTab==='week') renderWeekView();
-  else if(activeTab==='plan') renderPlanView();
-  else renderProgressView();
+  else renderPlanView();
 }
 expandedWeeks.add(currentWeekNum());
 render();
-
-// Strava: finish login redirect if present, then auto-sync (max once per 15 min)
-svHandleRedirect().then(()=>{
-  if(svConnected() && Date.now()-(sv.lastSync||0) > 15*60*1000) stravaSync(true);
-});
 
 // PWA: offline support when served over https (no-op when opened as a local file)
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
